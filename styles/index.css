@@ -1,7 +1,23 @@
-@import './button.css';
+@import "./button.css";
 
 /* purgecss start ignore */
 @tailwind base;
 @tailwind components;
 /* purgecss end ignore */
 @tailwind utilities;
+
+@layer utilities {
+  .h-42-px {
+    min-height: 42px;
+    height: 42px;
+  }
+  .checkbox {
+    min-height: 64px;
+    height: 64px;
+    min-width: 64px;
+    width: 64px;
+  }
+  .namebox {
+    cursor: pointer;
+  }
+}
