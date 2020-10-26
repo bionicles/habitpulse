@@ -4,14 +4,14 @@ import { is } from "ramda";
 var LOGGING = 1;
 var SYNCING = 0;
 
-const log = (x) => (LOGGING ? console.log(x) : (x) => x);
+// const log = (x) => (LOGGING ? console.log(x) : (x) => x);
 
 export const middleware = (state, action) => {
   if (LOGGING) {
     if (is(String, action)) {
-      log("DISPATCH: ", action);
+      console.log("DISPATCH: ", action);
     } else {
-      log("DISPATCH: ", ...action);
+      console.log("DISPATCH: ", ...action);
     }
   }
   const nextState = reduce(state, action);
@@ -28,7 +28,7 @@ export const middleware = (state, action) => {
       .catch((e) => console.error(e));
   }
   if (LOGGING) {
-    log("next state:", nextState);
+    console.log("next state:", nextState);
   }
   return nextState;
 };

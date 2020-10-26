@@ -1,11 +1,10 @@
 const dayjs = require("dayjs");
 
-const format = "dddd D MMMM YYYY, h:mm:ss A [UTC]Z";
-
+const format = "YYYYMMDD";
 /**
  * @example ```js const now = getNow();```
  * @returns {string} now - the current timestamp
  */
-const getNow = () => dayjs().format(format);
+const getToday = () => dayjs().format(format);
 
-module.exports = getNow;
+module.exports = getToday;
