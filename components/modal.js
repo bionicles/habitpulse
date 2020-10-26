@@ -11,40 +11,40 @@ export const Modal = () => {
       loading,
       error,
     },
-    dispatch,
+    set,
   } = useState();
 
   useEffect(() => {
-    dispatch(["SET", { error: "" }]);
+    set({ error: "" });
   }, [formState]);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    dispatch(["SET", { loading: true }]);
+    set({ loading: true });
     try {
       const user = await userbase.signUp({
         username,
         password,
         rememberMe: "none",
       });
-      dispatch(["SET", { user, loading: false, layoutMode: "" }]);
+      set({ user, loading: false, layoutMode: "" });
     } catch (e) {
-      dispatch(["SET", { loading: false, error: e.message }]);
+      set({ loading: false, error: e.message });
     }
   };
 
   async function handleLogIn(e) {
     e.preventDefault();
-    dispatch(["SET", { loading: true }]);
+    set({ loading: true });
     try {
       const user = await userbase.signIn({
         username,
         password,
         rememberMe: "none",
       });
-      dispatch(["SET", { user, loading: false, toggle: false }]);
+      set({ user, loading: false, toggle: false });
     } catch (e) {
-      dispatch(["SET", { loading: false, error: e.message }]);
+      set({ loading: false, error: e.message });
     }
   }
 
@@ -63,7 +63,7 @@ export const Modal = () => {
           type="text"
           placeholder="Username"
           value={username}
-          onChange={(e) => dispatch(["SET", { password: e.target.value }])}
+          onChange={(e) => set({ password: e.target.value })}
         />
       </div>
       <div className="mb-4">
@@ -79,13 +79,13 @@ export const Modal = () => {
           type="password"
           placeholder="*******"
           value={password}
-          onChange={(e) => dispatch(["SET", { password: e.target.value }])}
+          onChange={(e) => set({ password: e.target.value })}
         />
       </div>
       <div className="flex items-center justify-between">
         <span
           className="font-bold cursor-pointer"
-          onClick={() => dispatch(["SET", { layoutMode: "" }])}
+          onClick={() => set({ layoutMode: "" })}
         >
           Cancel
         </span>

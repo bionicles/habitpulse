@@ -8,8 +8,9 @@ const StateContext = createContext();
 
 export const StateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const set = (payload) => dispatch(["SET", payload]);
   const value = useMemo(() => {
-    return { state, dispatch };
+    return { state, dispatch, set };
   }, [state, dispatch]);
   return (
     <StateContext.Provider value={value}>{children}</StateContext.Provider>
