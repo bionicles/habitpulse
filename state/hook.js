@@ -1,13 +1,10 @@
 import React, { createContext, useContext, useReducer, useMemo } from "react";
-import { reduce, logger, initialState } from "state";
+import { middleware, initialState } from "state";
 
-const LOGGING = 1;
-
-const reducer = LOGGING ? logger : reduce;
 const StateContext = createContext();
 
 export const StateProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(middleware, initialState);
   const set = (payload) => dispatch(["SET", payload]);
   const value = useMemo(() => {
     return { state, dispatch, set };
