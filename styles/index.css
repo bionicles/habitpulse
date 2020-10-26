@@ -19,5 +19,7 @@
   }
   .namebox {
     cursor: pointer;
+    min-width: 38vw;
+    width: 38vw;
   }
 }

@@ -1,21 +1,21 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import userbase from "userbase-js";
-import Layout from "../components/layout.js";
 
+import { StateProvider, useState } from "state";
+import { Layout } from "components";
 import "../styles/index.css";
 
-function MyApp({ Component, pageProps }) {
-  const [user, setUser] = useState();
-
+const App = ({ Component, pageProps }) => {
   useEffect(() => {
     userbase.init({ appId: process.env.NEXT_PUBLIC_USERBASE_APP_ID });
   }, []);
-
   return (
-    <Layout user={user} setUser={setUser}>
-      <Component user={user} {...pageProps} />
-    </Layout>
+    <StateProvider>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </StateProvider>
   );
-}
+};
 
-export default MyApp;
+export default App;

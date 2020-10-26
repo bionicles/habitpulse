@@ -10,7 +10,7 @@ const DateGroup = () => (
   </>
 );
 
-const Table = () => (
+export const Table = () => (
   <table class="table-auto">
     <thead>
       <tr>

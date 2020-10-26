@@ -1,49 +1,50 @@
-import { useState, useEffect } from 'react'
-import userbase from 'userbase-js'
+import { useEffect } from "react";
+import userbase from "userbase-js";
 
-function LoginModal({ toggle, modalType, setUser }) {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState()
-  const [error, setError] = useState()
+import { useState } from "state";
+
+export const Modal = () => {
+  const {
+    state: {
+      formState,
+      user: { username, password },
+      loading,
+      error,
+    },
+    dispatch,
+  } = useState();
 
   useEffect(() => {
-    setError('')
-  }, [modalType])
+    dispatch(["SET", { error: "" }]);
+  }, [formState]);
 
-  async function handleSignUp(e) {
-    e.preventDefault()
-    setLoading(true)
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    dispatch(["SET", { loading: true }]);
     try {
       const user = await userbase.signUp({
         username,
         password,
-        rememberMe: 'none',
-      })
-      setUser(user)
-      setLoading(false)
-      toggle(false)
+        rememberMe: "none",
+      });
+      dispatch(["SET", { user, loading: false, layoutMode: "" }]);
     } catch (e) {
-      setLoading(false)
-      setError(e.message)
+      dispatch(["SET", { loading: false, error: e.message }]);
     }
-  }
+  };
 
   async function handleLogIn(e) {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    dispatch(["SET", { loading: true }]);
     try {
       const user = await userbase.signIn({
         username,
         password,
-        rememberMe: 'none',
-      })
-      setUser(user)
-      setLoading(false)
-      toggle(false)
+        rememberMe: "none",
+      });
+      dispatch(["SET", { user, loading: false, toggle: false }]);
     } catch (e) {
-      setLoading(false)
-      setError(e.message)
+      dispatch(["SET", { loading: false, error: e.message }]);
     }
   }
 
@@ -62,7 +63,7 @@ function LoginModal({ toggle, modalType, setUser }) {
           type="text"
           placeholder="Username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => dispatch(["SET", { password: e.target.value }])}
         />
       </div>
       <div className="mb-4">
@@ -78,23 +79,23 @@ function LoginModal({ toggle, modalType, setUser }) {
           type="password"
           placeholder="*******"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => dispatch(["SET", { password: e.target.value }])}
         />
       </div>
       <div className="flex items-center justify-between">
         <span
           className="font-bold cursor-pointer"
-          onClick={() => toggle(false)}
+          onClick={() => dispatch(["SET", { layoutMode: "" }])}
         >
           Cancel
         </span>
-        {modalType === 'logIn' ? (
+        {formState === "LOG_IN" ? (
           <button
             disabled={loading}
             className="btn-yellow"
             onClick={handleLogIn}
           >
-            {loading ? 'Logging In ...' : 'Log In'}
+            {loading ? "Logging In ..." : "Log In"}
           </button>
         ) : (
           <button
@@ -102,13 +103,11 @@ function LoginModal({ toggle, modalType, setUser }) {
             className="btn-yellow"
             onClick={handleSignUp}
           >
-            {loading ? 'Signing up ...' : 'Sign Up'}
+            {loading ? "Signing up ..." : "Sign Up"}
           </button>
         )}
       </div>
       <p className="text-red-500 font-bold">{error}</p>
     </form>
-  )
-}
-
-export default LoginModal
+  );
+};
