@@ -22,7 +22,6 @@
     min-width: 38.196601125vw;
     max-width: 38.196601125vw;
     z-index: 420;
-    background-color: white;
   }
   .h-42-px {
     min-height: 42px;
@@ -44,11 +43,7 @@
   }
   .namebox {
     cursor: grab;
-    min-width: 38vw;
-    width: 38vw;
-    max-width: 38vw;
     border: 1px solid black;
-    padding: 1em;
   }
   .namebox span {
     cursor: text;
@@ -56,7 +51,10 @@
   .rtl {
     direction: rtl;
   }
-  bordered {
+  .bordered {
     border: 1px solid black;
+  }
+  .new-habit-row {
+    border-top: 1px solid black;
   }
 }

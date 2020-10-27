@@ -2,8 +2,8 @@ import { useMemo, useEffect } from "react";
 import * as R from "ramda";
 import dayjs from "dayjs";
 
+import { getToday, playSnap } from "tricks";
 import { useState } from "state";
-import { getToday } from "tricks";
 
 const handleJump = () => {
   var tapeWrapper = document.getElementById("tape-wrapper");
@@ -40,7 +40,7 @@ export const Tape = () => {
       <table className="tape">
         <tr className="top-tape-row items-center">
           <th
-            className="left-side controls h-64-px namebox"
+            className="left-side bg-white controls h-64-px namebox"
             onClick={handleJump}
           >
             Today
@@ -51,7 +51,7 @@ export const Tape = () => {
         </tr>
         {R.values(habits).map((habit) => (
           <tr className="habit-row pt-2" habit={habit}>
-            <th className="left-side habit-name align-middle namebox flex h-64-px">
+            <th className="left-side habit-name bg-white align-middle namebox flex h-64-px">
               <span className="delete-habit-button inline-block align-middle">
                 delete
               </span>
@@ -61,23 +61,24 @@ export const Tape = () => {
             </th>
             {dates.map((date) => (
               <td
-                className="checkbox box"
+                className={`checkbox box cursor-pointer ${
+                  habits[habit.id].completions[date] ? "bg-green-500" : null
+                }`}
                 onClick={() => {
-                  assoc(["habits", habit.id, "completions", date], 1);
+                  playSnap();
+                  assoc([
+                    ["habits", habit.id, "completions", date],
+                    habits[habit.id].completions[date] ? 0 : 1,
+                  ]);
                 }}
               />
             ))}
           </tr>
         ))}
         <tr className="new-habit-row">
-          <th
-            className="new-habit namebox"
-            placeholder="Enter a habit..."
-            value={newHabit}
-            onChange={(e) => set({ newHabit: e.target.value })}
-          />
-          <h3>{newHabit}</h3>
-          <td className="add-habit-button">+</td>
+          <th className="new-habit bg-green-600 left-side cursor-pointer p-1">
+            Add Habit
+          </th>
         </tr>
       </table>
     </div>

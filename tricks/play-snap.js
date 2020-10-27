@@ -1,14 +1,12 @@
-const playSnap = async () => {
+export const playSnap = async () => {
   var playPromise = document.querySelector("audio").play();
   if (playPromise !== undefined) {
     playPromise
       .then(() => {
-        log("played snap");
+        console.log("played snap");
       })
-      .catch((e) => log(e));
+      .catch((e) => console.log(e));
   } else {
-    log(playPromise);
+    console.log(playPromise);
   }
 };
-
-export default playSnap;
