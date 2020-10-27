@@ -7,19 +7,56 @@
 @tailwind utilities;
 
 @layer utilities {
+  body {
+    overscroll-behavior-x: none;
+  }
+  .tape-wrapper {
+    overflow-x: scroll;
+    overflow-y: visible;
+    padding: 0;
+  }
+  .left-side {
+    position: absolute;
+    left: 0;
+    width: 38.196601125vw;
+    min-width: 38.196601125vw;
+    max-width: 38.196601125vw;
+    z-index: 420;
+    background-color: white;
+  }
   .h-42-px {
     min-height: 42px;
     height: 42px;
   }
-  .checkbox {
+  .h-64-px {
+    max-height: 64px;
     min-height: 64px;
     height: 64px;
+  }
+  .w-64-px {
+    max-width: 64px;
     min-width: 64px;
     width: 64px;
   }
+  .box {
+    @apply w-64-px h-64-px;
+    border: 1px solid black;
+  }
   .namebox {
-    cursor: pointer;
+    cursor: grab;
     min-width: 38vw;
     width: 38vw;
+    max-width: 38vw;
+    border: 1px solid black;
+    padding: 1em;
+  }
+  .namebox span {
+    cursor: text;
+  }
+  .rtl {
+    direction: rtl;
+  }
+  bordered {
+    border: 1px solid black;
   }
 }

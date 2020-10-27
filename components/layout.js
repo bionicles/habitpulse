@@ -6,7 +6,7 @@ export const Layout = ({ children }) => {
     state: { layoutMode },
   } = useState();
   return (
-    <div className="h-screen w-screen">
+    <div className="h-screen w-screen overflow-hidden max-w-full">
       <Nav />
       {layoutMode === "MODAL" ? (
         <div className="w-4/5 md:w-1/2 mx-auto">

@@ -5,14 +5,15 @@ export const initialState = {
     username: "",
     password: "",
   },
-  habits: [
-    { id: 1, name: "walk", completions: {} },
-    { id: 2, name: "run", completions: {} },
-    { id: 3, name: "lift", completions: {} },
-  ],
+  habits: {
+    1: { id: 1, name: "walk", completions: {} },
+    2: { id: 2, name: "run", completions: {} },
+    3: { id: 3, name: "lift", completions: {} },
+  },
   layoutMode: "",
   formState: "SIGN_UP",
   loading: false,
   error: false,
-  nextHabit: "Enter next habit...",
+  nextHabit: "",
+  habitPlaceholder: "Enter next habit...",
 };

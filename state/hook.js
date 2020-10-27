@@ -5,12 +5,16 @@ const StateContext = createContext();
 
 export const StateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(middleware, initialState);
-  const set = (payload) => dispatch(["SET", payload]);
-  const value = useMemo(() => {
-    return { state, dispatch, set };
+  const contextValue = useMemo(() => {
+    const set = (payload) => dispatch(["SET", payload]);
+    const assoc = (payload) => dispatch(["ASSOC", payload]);
+    const dissoc = (payload) => dispatch(["DISSOC", payload]);
+    return { state, dispatch, set, assoc, dissoc };
   }, [state, dispatch]);
   return (
-    <StateContext.Provider value={value}>{children}</StateContext.Provider>
+    <StateContext.Provider value={contextValue}>
+      {children}
+    </StateContext.Provider>
   );
 };
 

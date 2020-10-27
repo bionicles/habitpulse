@@ -1,3 +1,3 @@
-import Table from "../components/table.js";
+import { Tape } from "components";
 
-export default Table;
+export default Tape;

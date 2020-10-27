@@ -5,6 +5,17 @@ var LOGGING = 1;
 var SYNCING = 0;
 
 // const log = (x) => (LOGGING ? console.log(x) : (x) => x);
+// async function toggleComplete(itemId, currentValue) {
+//   try {
+//     await userbase.updateItem({
+//       databaseName: "next-userbase-todos",
+//       item: { ...currentValue, done: !currentValue.done },
+//       itemId,
+//     });
+//   } catch (e) {
+//     console.error(e.message);
+//   }
+// }
 
 export const middleware = (state, action) => {
   if (LOGGING) {

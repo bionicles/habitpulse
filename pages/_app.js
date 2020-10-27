@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import userbase from "userbase-js";
 
-import { StateProvider, useState } from "state";
+import { StateProvider } from "state";
 import { Layout } from "components";
 import "../styles/index.css";
 

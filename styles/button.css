@@ -18,6 +18,14 @@
   min-height: 42px;
 }
 
-.box {
-  @apply border-2 px-4 py-2 border-black;
+.box-text {
+  @apply cursor-text;
+}
+
+.left-side {
+  position: absolute;
+  left: 0;
+  width: 38.196601125vw;
+  min-width: 38.196601125vw;
+  max-width: 38.196601125vw;
 }
