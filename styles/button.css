@@ -9,6 +9,13 @@
 }
 .btn-green {
   @apply btn;
+  /* background-color: #49c774; */
+}
+.btn-green:hover {
+  @apply btn;
+  background-color: #49c774;
+}
+.green {
   background-color: #49c774;
 }
 .btn-yellow {

@@ -22,7 +22,7 @@ const getLastNDays = (n) =>
 const handleNameClick = (e) => e.target.select();
 
 export const Tape = () => {
-  const { set, assoc, dissoc, state } = useState();
+  const { dispatch, set, assoc, dissoc, state } = useState();
   const { habitIds } = state;
   const today = getToday();
 
@@ -56,6 +56,7 @@ export const Tape = () => {
     (e) => assoc([[e.target.name, "name"], e.target.value]),
     [assoc]
   );
+  const openModal = useCallback(() => dispatch("OPEN"), [dispatch]);
 
   useEffect(() => set({ dates }), [dates]);
   useEffect(handleJump, []);
@@ -64,17 +65,25 @@ export const Tape = () => {
       <table className="tape">
         <thead>
           <tr className="top-tape-row items-center">
-            <th
-              className="left-side bg-white hover:bg-gray-200 controls h-64-px namebox cursor-pointer text-2xl py-auto flex"
-              onClick={handleJump}
-            >
-              <button className="btn-green bordered inline-block m-auto cursor-pointer">
-                >> Today >>
+            <th className="left-side cursor-default bg-white hover:bg-gray-200 controls h-64-px text-2xl py-auto flex">
+              <button className="btn-green bordered" onClick={addHabit}>
+                Add Habit
+              </button>
+              <button
+                className="btn-green bordered inline-block m-auto cursor-pointer"
+                onClick={handleJump}
+              >
+                Today
+              </button>
+              <button className="btn-green bordered" onClick={openModal}>
+                Sync
               </button>
             </th>
             {dates.map((date) => (
               <td
-                className="date-box box text-center cursor-default select-none"
+                className={`date-box box text-center cursor-default select-none ${
+                  date == today ? "green" : null
+                }`}
                 key={date}
               >
                 {date.substr(-2)}
@@ -95,9 +104,9 @@ export const Tape = () => {
                   >
                     delete
                   </button>
-                  <div className="flex-grow inline-block cursor-grab hover:bg-gray-200 text-4xl">
+                  <div className="flex-grow flex inline-block cursor-grab hover:bg-gray-200 text-2xl">
                     <input
-                      className="cursor-text hover:bg-gray-200"
+                      className="cursor-text hover:bg-gray-200 m-auto bordered text-right px-4"
                       onClick={handleNameClick}
                       name={habitId}
                       value={habit.name}
@@ -122,13 +131,6 @@ export const Tape = () => {
               </tr>
             );
           })}
-          <tr className="new-habit-row">
-            <th className="new-habit left-side cursor-pointer p-1">
-              <button className="btn-green bordered" onClick={addHabit}>
-                Add Habit
-              </button>
-            </th>
-          </tr>
         </tbody>
       </table>
     </div>

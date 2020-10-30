@@ -14,13 +14,6 @@ export const Nav = () => {
       <div className="flex-grow p-2 centered text-xl items-center">
         HabitPulse
       </div>
-      <ul className="flex-shrink flex justify-end items-center">
-        <li>
-          <button className="btn-green bordered" onClick={openModal}>
-            Save & Sync
-          </button>
-        </li>
-      </ul>
     </nav>
   );
 };
