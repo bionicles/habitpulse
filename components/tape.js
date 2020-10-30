@@ -16,8 +16,11 @@ const handleScroll = (e) =>
   );
 
 const handleJump = () => {
-  const scrollRows = document.getElementsByClassName("scroll");
-  R.forEach((row) => (row.scrollLeft = 9001), scrollRows);
+  playSnap();
+  R.forEach(
+    (row) => (row.scrollLeft = 9001),
+    document.getElementsByClassName("scroll")
+  );
 };
 
 const getLastNDays = (n) =>
