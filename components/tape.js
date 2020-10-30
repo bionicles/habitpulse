@@ -65,12 +65,12 @@ export const Tape = () => {
       <table className="tape">
         <thead>
           <tr className="top-tape-row items-center">
-            <th className="left-side cursor-default bg-white hover:bg-gray-200 controls h-64-px text-2xl py-auto flex">
+            <th className="left-side cursor-default bg-white controls h-64-px text-xl py-auto flex items-center justify-center">
               <button className="btn-green bordered" onClick={addHabit}>
                 Add Habit
               </button>
               <button
-                className="btn-green bordered inline-block m-auto cursor-pointer"
+                className="btn-green bordered inline-block cursor-pointer"
                 onClick={handleJump}
               >
                 Today
