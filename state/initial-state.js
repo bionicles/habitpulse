@@ -1,5 +1,3 @@
-import { getToday } from "tricks";
-
 export const initialState = {
   user: {
     username: "",

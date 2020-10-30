@@ -1,16 +1,25 @@
+.btn {
+  @apply text-black font-bold py-2 px-4 rounded;
+}
+.btn-red {
+  @apply btn;
+}
+.bg-red-400 {
+  background-color: #f24767;
+}
+.btn-green {
+  @apply btn;
+  background-color: #49c774;
+}
 .btn-yellow {
   @apply bg-yellow-400 text-black font-bold py-2 px-4 rounded;
 }
-
 .btn-yellow:hover {
   @apply bg-yellow-500;
 }
-
-.btn-green {
-  @apply text-black font-bold py-2 px-4 rounded;
-  background-color: #49c774;
+.btn-red {
+  @apply btn;
 }
-
 .btn-green:hover {
   @apply bg-green-500;
 }

@@ -1,3 +1,4 @@
+import * as Automerge from "automerge";
 import * as R from "ramda";
 
 const PAYLOADS = {

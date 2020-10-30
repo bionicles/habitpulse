@@ -16,7 +16,7 @@ export const Nav = () => {
       </div>
       <ul className="flex-shrink flex justify-end items-center">
         <li>
-          <button className="btn-green" onClick={openModal}>
+          <button className="btn-green bordered" onClick={openModal}>
             Save & Sync
           </button>
         </li>

@@ -19,6 +19,8 @@ const getLastNDays = (n) =>
     })
   );
 
+const handleNameClick = (e) => e.target.select();
+
 export const Tape = () => {
   const { set, assoc, dissoc, state } = useState();
   const { habitIds } = state;
@@ -37,6 +39,24 @@ export const Tape = () => {
     });
   }, [set]);
 
+  const deleteHabit = useCallback(
+    (e) => {
+      console.log(e.target.name);
+      const newHabitIds = R.filter((x) => x != e.target.name, habitIds);
+      console.log("newHabitIds: ", newHabitIds);
+      set({
+        habitIds: newHabitIds,
+        [e.target.name]: undefined,
+      });
+    },
+    [habitIds, dissoc]
+  );
+
+  const updateHabit = useCallback(
+    (e) => assoc([[e.target.name, "name"], e.target.value]),
+    [assoc]
+  );
+
   useEffect(() => set({ dates }), [dates]);
   useEffect(handleJump, []);
   return (
@@ -48,10 +68,15 @@ export const Tape = () => {
               className="left-side bg-white hover:bg-gray-200 controls h-64-px namebox cursor-pointer text-2xl py-auto flex"
               onClick={handleJump}
             >
-              <span className="inline-block m-auto">>> Today >></span>
+              <button className="btn-green bordered inline-block m-auto cursor-pointer">
+                >> Today >>
+              </button>
             </th>
             {dates.map((date) => (
-              <td className="date-box box text-center" key={date}>
+              <td
+                className="date-box box text-center cursor-default select-none"
+                key={date}
+              >
                 {date.substr(-2)}
               </td>
             ))}
@@ -62,18 +87,28 @@ export const Tape = () => {
             const habit = state[habitId];
             return (
               <tr className="habit-row pt-2" key={habitId}>
-                <th className="left-side habit-name bg-white align-middle namebox flex h-64-px">
-                  <span className="delete-habit-button my-auto inline-block cursor-pointer hover:bg-gray-200">
+                <th className="left-side habit-name bg-white align-middle namebox flex h-64-px hover:bg-gray-200">
+                  <button
+                    className="delete-habit-button bordered btn hover:bg-red-400 my-auto inline-block cursor-pointer hover:bg-gray-200"
+                    onClick={deleteHabit}
+                    name={habitId}
+                  >
                     delete
-                  </span>
+                  </button>
                   <div className="flex-grow inline-block cursor-grab hover:bg-gray-200 text-4xl">
-                    <span className="cursor-text">{habit.name}</span>
+                    <input
+                      className="cursor-text hover:bg-gray-200"
+                      onClick={handleNameClick}
+                      name={habitId}
+                      value={habit.name}
+                      onChange={updateHabit}
+                    />
                   </div>
                 </th>
                 {dates.map((date) => (
                   <td
                     className={`checkbox box cursor-pointer hover:bg-gray-200 ${
-                      habit[date] ? "bg-green-500" : null
+                      habit[date] ? "bg-green-500 hover:bg-green-500" : null
                     }`}
                     onClick={() => {
                       playSnap();
@@ -89,7 +124,7 @@ export const Tape = () => {
           })}
           <tr className="new-habit-row">
             <th className="new-habit left-side cursor-pointer p-1">
-              <button className="btn-green" onClick={addHabit}>
+              <button className="btn-green bordered" onClick={addHabit}>
                 Add Habit
               </button>
             </th>

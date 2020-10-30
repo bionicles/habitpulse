@@ -92,18 +92,18 @@ export const Modal = () => {
         {formState === "LOG_IN" ? (
           <button
             disabled={loading}
-            className="btn-yellow"
+            className="bordered btn-green"
             onClick={handleLogIn}
           >
-            {loading ? "Logging In ..." : "Log In"}
+            {loading ? "Syncing..." : "Log In"}
           </button>
         ) : (
           <button
             disabled={loading}
-            className="btn-yellow"
+            className="bordered btn-green"
             onClick={handleSignUp}
           >
-            {loading ? "Signing up ..." : "Sign Up"}
+            {loading ? "Syncing..." : "Sign Up"}
           </button>
         )}
       </div>
