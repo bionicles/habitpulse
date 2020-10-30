@@ -16,12 +16,21 @@
     padding: 0;
   }
   .left-side {
-    position: absolute;
-    left: 0;
+    /* position: absolute; */
+    /* left: 0; */
     width: 38.196601125vw;
     min-width: 38.196601125vw;
     max-width: 38.196601125vw;
-    z-index: 420;
+    /* z-index: 420; */
+  }
+  .right-side {
+    /* position: absolute; */
+    /* right: 0; */
+    width: 61.803398875vw;
+    min-width: 61.803398875vw;
+    max-width: 61.803398875vw;
+    overflow-x: scroll;
+    /* z-index: 420; */
   }
   .h-42-px {
     min-height: 42px;
@@ -54,4 +63,12 @@
   .new-habit-row {
     border-top: 1px solid black;
   }
+}
+.no-scrollbar {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

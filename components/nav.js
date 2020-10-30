@@ -7,10 +7,8 @@ export const Nav = () => {
     state: { user, layoutMode },
   } = useState();
 
-  const openModal = useCallback(() => dispatch("OPEN"), [dispatch]);
-
   return (
-    <nav className="flex block h-42-px items-center w-screen border-b-1 border-black">
+    <nav className="flex block h-42-px items-center w-screen bordered">
       <div className="flex-grow p-2 centered text-xl items-center">
         HabitPulse
       </div>

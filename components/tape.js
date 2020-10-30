@@ -6,10 +6,15 @@ import { getToday, playSnap } from "tricks";
 import { useState } from "state";
 import { nanoid } from "nanoid";
 
+const handleScroll = (e) => {
+  const x = e.target.scrollLeft;
+  const scrollRows = document.getElementsByClassName("scroll");
+  R.forEach((row) => (row.scrollLeft = x), scrollRows);
+};
+
 const handleJump = () => {
-  var tapeWrapper = document.getElementById("tape-wrapper");
-  console.log("tapeWrapper.outerWidth", tapeWrapper.outerWidth);
-  tapeWrapper.scrollLeft = 9001;
+  const scrollRows = document.getElementsByClassName("scroll");
+  R.forEach((row) => (row.scrollLeft = 9001), scrollRows);
 };
 
 const getLastNDays = (n) =>
@@ -30,6 +35,8 @@ export const Tape = () => {
     const dates = getLastNDays(64);
     return dates;
   }, [today]);
+
+  useEffect(() => window.addEventListener("scroll", handleScroll, true), []);
 
   const addHabit = useCallback(() => {
     const newHabit = { id: nanoid(), name: "Enter a habit..." };
@@ -61,11 +68,11 @@ export const Tape = () => {
   useEffect(() => set({ dates }), [dates]);
   useEffect(handleJump, []);
   return (
-    <div className="tape-wrapper" id="tape-wrapper">
+    <div className="tape-wrapper my-2" id="tape-wrapper">
       <table className="tape">
         <thead>
           <tr className="top-tape-row items-center">
-            <th className="left-side cursor-default bg-white controls h-64-px text-xl py-auto flex items-center justify-center">
+            <th className="left-side cursor-default bordered bg-white controls h-64-px text-xl py-auto flex items-center justify-center">
               <button className="btn-green bordered" onClick={addHabit}>
                 Add Habit
               </button>
@@ -79,16 +86,18 @@ export const Tape = () => {
                 Sync
               </button>
             </th>
-            {dates.map((date) => (
-              <td
-                className={`date-box box text-center cursor-default select-none ${
-                  date == today ? "green" : null
-                }`}
-                key={date}
-              >
-                {date.substr(-2)}
-              </td>
-            ))}
+            <th className="right-side scroll">
+              {dates.map((date) => (
+                <td
+                  className={`date-box box text-center cursor-default select-none ${
+                    date == today ? "green" : null
+                  }`}
+                  key={date}
+                >
+                  {date.substr(-2)}
+                </td>
+              ))}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -102,32 +111,35 @@ export const Tape = () => {
                     onClick={deleteHabit}
                     name={habitId}
                   >
-                    delete
+                    x
                   </button>
-                  <div className="flex-grow flex inline-block cursor-grab hover:bg-gray-200 text-2xl">
+                  <div className="flex inline-block cursor-grab hover:bg-gray-200 text-xl">
                     <input
-                      className="cursor-text hover:bg-gray-200 m-auto bordered text-right px-4"
+                      className="cursor-text hover:bg-gray-200 m-auto bordered"
                       onClick={handleNameClick}
                       name={habitId}
                       value={habit.name}
                       onChange={updateHabit}
+                      size="16"
                     />
                   </div>
                 </th>
-                {dates.map((date) => (
-                  <td
-                    className={`checkbox box cursor-pointer hover:bg-gray-200 ${
-                      habit[date] ? "bg-green-500 hover:bg-green-500" : null
-                    }`}
-                    onClick={() => {
-                      playSnap();
-                      habit[date]
-                        ? dissoc([habitId, date])
-                        : assoc([[habitId, date], 1]);
-                    }}
-                    key={`${habitId}-${date}`}
-                  />
-                ))}
+                <th className="right-side no-scrollbar scroll ">
+                  {dates.map((date) => (
+                    <td
+                      className={`checkbox box cursor-pointer hover:bg-gray-200 ${
+                        habit[date] ? "bg-green-500 hover:bg-green-500" : null
+                      }`}
+                      onClick={() => {
+                        playSnap();
+                        habit[date]
+                          ? dissoc([habitId, date])
+                          : assoc([[habitId, date], 1]);
+                      }}
+                      key={`${habitId}-${date}`}
+                    />
+                  ))}
+                </th>
               </tr>
             );
           })}
