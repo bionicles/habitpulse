@@ -45,10 +45,10 @@ export const Tape = () => {
         <thead>
           <tr className="top-tape-row items-center">
             <th
-              className="left-side bg-white controls h-64-px namebox cursor-pointer"
+              className="left-side bg-white hover:bg-gray-200 controls h-64-px namebox cursor-pointer text-2xl py-auto flex"
               onClick={handleJump}
             >
-              Today
+              <span className="inline-block m-auto">>> Today >></span>
             </th>
             {dates.map((date) => (
               <td className="date-box box text-center" key={date}>
@@ -63,7 +63,7 @@ export const Tape = () => {
             return (
               <tr className="habit-row pt-2" key={habitId}>
                 <th className="left-side habit-name bg-white align-middle namebox flex h-64-px">
-                  <span className="delete-habit-button my-auto inline-block cursor-pointer">
+                  <span className="delete-habit-button my-auto inline-block cursor-pointer hover:bg-gray-200">
                     delete
                   </span>
                   <div className="flex-grow inline-block cursor-grab hover:bg-gray-200 text-4xl">
