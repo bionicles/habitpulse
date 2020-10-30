@@ -1520,16 +1520,6 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-automerge@^0.14.1:
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/automerge/-/automerge-0.14.1.tgz#ba127917bd660bb68fd6a438d8d5f5ab49f5a60b"
-  integrity sha512-9UtszKSqxVxXesbHxS6Wv7fPjmImawIlHzKs0O1DC5zcS4cMHB5eDeP6D/rVh5z4nMLfYSWSl2UufR7cvN3JnQ==
-  dependencies:
-    immutable "^3.8.2"
-    transit-immutable-js "^0.7.0"
-    transit-js "^0.8.861"
-    uuid "^3.4.0"
-
 autoprefixer@^9.4.5, autoprefixer@^9.6.1:
   version "9.8.6"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.8.6.tgz#3b73594ca1bf9266320c5acf1588d74dea74210f"
@@ -3047,11 +3037,6 @@ iferr@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/iferr/-/iferr-0.1.5.tgz#c60eed69e6d8fdb6b3104a1fcbca1c192dc5b501"
   integrity sha1-xg7taebY/bazEEofy8ocGS3FtQE=
-
-immutable@^3.8.2:
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.8.2.tgz#c2439951455bb39913daf281376f1530e104adf3"
-  integrity sha1-wkOZUUVbs5kT2vKBN28VMOEErfM=
 
 imurmurhash@^0.1.4:
   version "0.1.4"
@@ -5452,16 +5437,6 @@ tr46@^1.0.1:
   dependencies:
     punycode "^2.1.0"
 
-transit-immutable-js@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/transit-immutable-js/-/transit-immutable-js-0.7.0.tgz#993e25089b6311ff402140f556276d6d253005d9"
-  integrity sha1-mT4lCJtjEf9AIUD1VidtbSUwBdk=
-
-transit-js@^0.8.861:
-  version "0.8.867"
-  resolved "https://registry.yarnpkg.com/transit-js/-/transit-js-0.8.867.tgz#86ad3f1c33bfd1ebafaadd87911e4361cced2b4f"
-  integrity sha512-rOwB4K0z/WZ+E2bV42iN9UV3mvGzmwSv/IpMOKdnFpawPAZT0d1L7f91Y+tZQF7lXSDGk+oln4XyIQXo+pyTGA==
-
 traverse@0.6.6:
   version "0.6.6"
   resolved "https://registry.yarnpkg.com/traverse/-/traverse-0.6.6.tgz#cbdf560fd7b9af632502fed40f918c157ea97137"
@@ -5636,7 +5611,7 @@ util@^0.11.0:
   dependencies:
     inherits "2.0.3"
 
-uuid@^3.3.3, uuid@^3.4.0:
+uuid@^3.3.3:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
