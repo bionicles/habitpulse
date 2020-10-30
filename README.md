@@ -1,3 +1,3 @@
 # HabitPulse
 
-Track your habits over time! [Try our cool demo.](XXXXXXXXX.now.sh)
+Track your habits over time! [Try our cool demo.](habitpulse.now.sh)
