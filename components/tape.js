@@ -46,18 +46,14 @@ export const Tape = () => {
             Today
           </th>
           {dates.map((date) => (
-            <td className="date-box box">{date.substr(-2)}</td>
+            <td className="date-box box text-center">{date.substr(-2)}</td>
           ))}
         </tr>
         {R.values(habits).map((habit) => (
           <tr className="habit-row pt-2" habit={habit}>
             <th className="left-side habit-name bg-white align-middle namebox flex h-64-px">
-              <span className="delete-habit-button inline-block align-middle">
-                delete
-              </span>
-              <h3 className="flex-grow inline-block align-middle">
-                {habit.name}
-              </h3>
+              <span className="delete-habit-button inline-block">delete</span>
+              <h3 className="flex-grow inline-block">{habit.name}</h3>
             </th>
             {dates.map((date) => (
               <td
