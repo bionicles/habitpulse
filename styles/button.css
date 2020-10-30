@@ -7,7 +7,8 @@
 }
 
 .btn-green {
-  @apply bg-green-400 text-black font-bold py-2 px-4 rounded;
+  @apply text-black font-bold py-2 px-4 rounded;
+  background-color: #49c774;
 }
 
 .btn-green:hover {

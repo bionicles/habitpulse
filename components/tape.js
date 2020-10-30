@@ -1,9 +1,10 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useCallback } from "react";
 import * as R from "ramda";
 import dayjs from "dayjs";
 
 import { getToday, playSnap } from "tricks";
 import { useState } from "state";
+import { nanoid } from "nanoid";
 
 const handleJump = () => {
   var tapeWrapper = document.getElementById("tape-wrapper");
@@ -19,63 +20,81 @@ const getLastNDays = (n) =>
   );
 
 export const Tape = () => {
-  const {
-    set,
-    assoc,
-    state: { habits, newHabit },
-  } = useState();
-
+  const { set, assoc, dissoc, state } = useState();
+  const { habitIds } = state;
   const today = getToday();
 
   const dates = useMemo(() => {
     const dates = getLastNDays(64);
-    set({ dates });
     return dates;
   }, [today]);
 
-  useEffect(handleJump, []);
+  const addHabit = useCallback(() => {
+    const newHabit = { id: nanoid(), name: "Enter a habit..." };
+    set({
+      habitIds: [...state.habitIds, newHabit.id],
+      [newHabit.id]: newHabit,
+    });
+  }, [set]);
 
+  useEffect(() => set({ dates }), [dates]);
+  useEffect(handleJump, []);
   return (
     <div className="tape-wrapper" id="tape-wrapper">
       <table className="tape">
-        <tr className="top-tape-row items-center">
-          <th
-            className="left-side bg-white controls h-64-px namebox"
-            onClick={handleJump}
-          >
-            Today
-          </th>
-          {dates.map((date) => (
-            <td className="date-box box text-center">{date.substr(-2)}</td>
-          ))}
-        </tr>
-        {R.values(habits).map((habit) => (
-          <tr className="habit-row pt-2" habit={habit}>
-            <th className="left-side habit-name bg-white align-middle namebox flex h-64-px">
-              <span className="delete-habit-button inline-block">delete</span>
-              <h3 className="flex-grow inline-block">{habit.name}</h3>
+        <thead>
+          <tr className="top-tape-row items-center">
+            <th
+              className="left-side bg-white controls h-64-px namebox cursor-pointer"
+              onClick={handleJump}
+            >
+              Today
             </th>
             {dates.map((date) => (
-              <td
-                className={`checkbox box cursor-pointer ${
-                  habits[habit.id].completions[date] ? "bg-green-500" : null
-                }`}
-                onClick={() => {
-                  playSnap();
-                  assoc([
-                    ["habits", habit.id, "completions", date],
-                    habits[habit.id].completions[date] ? 0 : 1,
-                  ]);
-                }}
-              />
+              <td className="date-box box text-center" key={date}>
+                {date.substr(-2)}
+              </td>
             ))}
           </tr>
-        ))}
-        <tr className="new-habit-row">
-          <th className="new-habit bg-green-600 left-side cursor-pointer p-1">
-            Add Habit
-          </th>
-        </tr>
+        </thead>
+        <tbody>
+          {R.values(habitIds).map((habitId) => {
+            const habit = state[habitId];
+            return (
+              <tr className="habit-row pt-2" key={habitId}>
+                <th className="left-side habit-name bg-white align-middle namebox flex h-64-px">
+                  <span className="delete-habit-button my-auto inline-block cursor-pointer">
+                    delete
+                  </span>
+                  <div className="flex-grow inline-block cursor-grab hover:bg-gray-200 text-4xl">
+                    <span className="cursor-text">{habit.name}</span>
+                  </div>
+                </th>
+                {dates.map((date) => (
+                  <td
+                    className={`checkbox box cursor-pointer hover:bg-gray-200 ${
+                      habit[date] ? "bg-green-500" : null
+                    }`}
+                    onClick={() => {
+                      playSnap();
+                      habit[date]
+                        ? dissoc([habitId, date])
+                        : assoc([[habitId, date], 1]);
+                    }}
+                    key={`${habitId}-${date}`}
+                  />
+                ))}
+              </tr>
+            );
+          })}
+          <tr className="new-habit-row">
+            <th className="new-habit left-side cursor-pointer p-1">
+              <button className="btn-green" onClick={addHabit}>
+                Add Habit
+              </button>
+            </th>
+          </tr>
+        </tbody>
       </table>
     </div>
   );

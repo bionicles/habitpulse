@@ -45,9 +45,6 @@
     cursor: grab;
     border: 1px solid black;
   }
-  .namebox span {
-    cursor: text;
-  }
   .rtl {
     direction: rtl;
   }
