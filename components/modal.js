@@ -5,19 +5,14 @@ import { useState } from "state";
 
 export const Modal = () => {
   const {
-    state: { formState, username, password, loading, error },
+    state: { username, password, loading, error },
     set,
-    assoc,
   } = useState();
 
   const handleChange = useCallback(
     (e) => set({ [e.target.name]: e.target.value }),
     [set]
   );
-
-  useEffect(() => {
-    set({ error: "" });
-  }, [formState]);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -28,13 +23,19 @@ export const Modal = () => {
         password,
         rememberMe: "local",
       });
-      set({ user, loading: false, layoutMode: "" });
+      set({
+        user,
+        password: "",
+        loggedIn: 1,
+        loading: false,
+        layoutMode: "",
+      });
     } catch (e) {
       set({ loading: false, error: e.message });
     }
   };
 
-  async function handleSignIn(e) {
+  const handleSignIn = useCallback(async (e) => {
     e.preventDefault();
     set({ loading: true });
     try {
@@ -44,7 +45,7 @@ export const Modal = () => {
         rememberMe: "local",
       });
       set({
-        username,
+        user,
         password: "",
         loggedIn: 1,
         loading: false,
@@ -53,7 +54,7 @@ export const Modal = () => {
     } catch (e) {
       set({ loading: false, error: e.message });
     }
-  }
+  });
 
   return (
     <form className="bg-white shadow-md rounded p-8">

@@ -47,22 +47,6 @@ export const Tape = () => {
   const { habitIds } = state;
   const today = getToday();
 
-  // const lastWriteWins = useCallback(
-  //   (states) => {
-  //     const latest = R.reduce((acc, elem) => {
-  //       if (R.isNil(acc)) {
-  //         return elem;
-  //       }
-  //       if (dayjs(elem.timestamp).isAfter(dayjs(acc.timestamp))) {
-  //         return elem;
-  //       }
-  //       return acc;
-  //     }, states);
-  //     set(latest);
-  //   },
-  //   [set]
-  // );
-
   useEffect(() => {
     const storedString = window.localStorage.getItem("state");
     console.log("storedString:", storedString);
@@ -76,21 +60,22 @@ export const Tape = () => {
     }
   }, []);
 
-  const openDatabase = useCallback(async () => {
-    try {
-      await userbase.openDatabase({
-        databaseName: "state",
-        changeHandler: (items) => {
-          if (dayjs(items.timestamp).isAfter(dayjs(state.timestamp))) {
-            set(items);
-          }
-        },
-      });
-    } catch (e) {
-      console.error(e.message);
+  useEffect(() => {
+    if (state.loggedIn) {
+      try {
+        userbase.openDatabase({
+          databaseName: "state",
+          changeHandler: (items) => {
+            if (dayjs(items.timestamp).isAfter(dayjs(state.timestamp))) {
+              set(items);
+            }
+          },
+        });
+      } catch (e) {
+        console.error(e.message);
+      }
     }
-  }, [set]);
-  useEffect(() => state.loggedIn && openDatabase(), [state.loggedIn]);
+  }, [state.loggedIn]);
   useEffect(() => {
     window.localStorage.setItem("state", JSON.stringify(state));
     if (state.loggedIn) {
