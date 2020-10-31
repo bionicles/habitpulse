@@ -9,5 +9,6 @@ export const initialState = {
   formState: "SIGN_UP",
   loading: false,
   error: false,
-  loggedIn: 0,
+  signedIn: 0,
+  connected: 0,
 };

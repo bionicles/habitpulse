@@ -1,12 +1,13 @@
 import { useEffect, useCallback } from "react";
 import userbase from "userbase-js";
 
-import { useState } from "state";
+import { useState, initialState } from "state";
 
 export const Modal = () => {
   const {
     state: { username, password, loading, error },
     set,
+    dispatch,
   } = useState();
 
   const handleChange = useCallback(
@@ -26,7 +27,7 @@ export const Modal = () => {
       set({
         user,
         password: "",
-        loggedIn: 1,
+        signedIn: 1,
         loading: false,
         layoutMode: "",
       });
@@ -38,23 +39,49 @@ export const Modal = () => {
   const handleSignIn = useCallback(async (e) => {
     e.preventDefault();
     set({ loading: true });
-    try {
-      const user = await userbase.signIn({
+    const user = userbase
+      .signIn({
         username,
         password,
         rememberMe: "local",
+      })
+      .then((user) =>
+        set({
+          user,
+          password: "",
+          signedIn: 1,
+          loading: false,
+          layoutMode: "",
+        })
+      )
+      .catch((e) => {
+        if (e.message == "Already signed in.") {
+          set({ layoutMode: "", signedIn: 1, loading: false });
+        } else {
+          set({ loading: false, error: e.message });
+        }
       });
-      set({
-        user,
-        password: "",
-        loggedIn: 1,
-        loading: false,
-        layoutMode: "",
-      });
-    } catch (e) {
-      set({ loading: false, error: e.message });
-    }
   });
+
+  const handleSignOut = useCallback(() => {
+    userbase
+      .signOut()
+      .then(() => {
+        set(initialState);
+        window.localStorage.clear();
+      })
+      .catch((e) => console.error("handleSignOut Error:", e));
+  }, [userbase]);
+
+  const handleDeleteUser = useCallback(() => {
+    userbase
+      .deleteUser()
+      .then(() => {
+        window.localStorage.clear();
+        dispatch("RESET");
+      })
+      .catch((e) => console.error("handleSignOut Error:", e));
+  }, [userbase]);
 
   return (
     <form className="bg-white shadow-md rounded p-8">
@@ -106,14 +133,28 @@ export const Modal = () => {
             className="bordered btn-green"
             onClick={handleSignIn}
           >
-            {loading ? "Syncing..." : "Sign In"}
+            {loading ? "Running..." : "Sign In"}
           </button>
           <button
             disabled={loading}
             className="bordered btn-green"
             onClick={handleSignUp}
           >
-            {loading ? "Syncing..." : "Sign Up"}
+            {loading ? "Running..." : "Sign Up"}
+          </button>
+          <button
+            disabled={loading}
+            className="bordered btn-red"
+            onClick={handleSignOut}
+          >
+            {loading ? "Running..." : "Sign Out"}
+          </button>
+          <button
+            disabled={loading}
+            className="bordered btn-red"
+            onClick={handleDeleteUser}
+          >
+            {loading ? "Running..." : "Delete Account"}
           </button>
         </div>
       </div>

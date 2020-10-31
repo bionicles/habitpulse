@@ -44,13 +44,11 @@ const notNil = (x) => !R.isNil(x);
 
 export const Tape = () => {
   const { dispatch, set, assoc, dissoc, state } = useState();
-  const { habitIds } = state;
+  const { habitIds, signedIn } = state;
   const today = getToday();
 
   useEffect(() => {
     const storedString = window.localStorage.getItem("state");
-    console.log("storedString:", storedString);
-    console.log("storedString isNil:", R.isNil(storedString));
     let savedState;
     if (notNil(storedString) && R.is(String, storedString)) {
       savedState = JSON.parse(storedString);
@@ -61,33 +59,52 @@ export const Tape = () => {
   }, []);
 
   useEffect(() => {
-    if (state.loggedIn) {
-      try {
-        userbase.openDatabase({
-          databaseName: "state",
-          changeHandler: (items) => {
-            if (dayjs(items.timestamp).isAfter(dayjs(state.timestamp))) {
-              set(items);
-            }
-          },
-        });
-      } catch (e) {
-        console.error(e.message);
+    async function openDatabase() {
+      if (state.signedIn) {
+        userbase
+          .openDatabase({
+            databaseName: "state",
+            changeHandler: (items) => {
+              if (dayjs(items.timestamp).isAfter(dayjs(state.timestamp))) {
+                set(items);
+              }
+            },
+          })
+          .then(() => set({ connected: 1 }))
+          .catch(console.error);
       }
     }
-  }, [state.loggedIn]);
+    openDatabase();
+  }, [state.signedIn]);
+
   useEffect(() => {
     window.localStorage.setItem("state", JSON.stringify(state));
-    if (state.loggedIn) {
-      userbase.updateItem({
-        databaseName: "state",
-        item: {
-          timestamp: state.timestamp,
-          habitIds: state.habitIds,
-          ...R.pick(state.habitIds, state),
-        },
-        itemId: "state",
-      });
+    if (state.signedIn && state.connected) {
+      try {
+        userbase
+          .updateItem({
+            databaseName: "state",
+            item: {
+              timestamp: state.timestamp,
+              habitIds: state.habitIds,
+              ...R.pick(state.habitIds, state),
+            },
+            itemId: "state",
+          })
+          .then(() => console.log(state.timestamp))
+          .catch((e) => console.error(e));
+      } catch (e) {
+        console.error(e);
+        userbase.insertItem({
+          databaseName: "state",
+          itemId: "state",
+          item: {
+            timestamp: state.timestamp,
+            habitIds: state.habitIds,
+            ...R.pick(state.habitIds, state),
+          },
+        });
+      }
     }
   }, [state]);
 
@@ -157,7 +174,7 @@ export const Tape = () => {
               >
                 Today
               </button>
-              <button className="btn-green bordered" onClick={openModal}>
+              <button className={`btn-green bordered`} onClick={openModal}>
                 Sync
               </button>
             </th>

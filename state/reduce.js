@@ -5,8 +5,8 @@ const PAYLOADS = {
   OPEN: { layoutMode: "MODAL" }, // OPEN / CLOSE MODAL!!
   CLOSE: { layoutMode: "" },
   CLEAR_PASSWORD: { password: "" },
-  LOGOUT: { loggedIn: 0 },
-  LOGIN: { loggedIn: 1 },
+  SIGNOUT: { signedIn: 0 },
+  SIGNIN: { signedIn: 1 },
 };
 
 export const reduce = (noTimeStampState, action) => {
@@ -21,6 +21,8 @@ export const reduce = (noTimeStampState, action) => {
     newState = R.assocPath(targetPath, value, state);
   } else if (type === "DISSOC") {
     newState = R.dissocPath(payload, state);
+  } else if (type === "RESET") {
+    newState = initialState;
   } else {
     same = true;
     newState = state;

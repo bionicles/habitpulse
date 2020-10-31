@@ -4,8 +4,13 @@
 .btn-red {
   @apply btn;
 }
+.btn-red:hover {
+  background-color: #f24767;
+  color: white;
+}
 .bg-red-400 {
   background-color: #f24767;
+  color: white;
 }
 .btn-green {
   @apply btn;
@@ -14,9 +19,11 @@
 .btn-green:hover {
   @apply btn;
   background-color: #49c774;
+  color: white;
 }
 .green {
   background-color: #49c774;
+  color: white;
 }
 .btn-yellow {
   @apply bg-yellow-400 text-black font-bold py-2 px-4 rounded;
