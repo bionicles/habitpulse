@@ -1,18 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import userbase from "userbase-js";
 
 import { useState } from "state";
 
 export const Modal = () => {
   const {
-    state: {
-      formState,
-      user: { username, password },
-      loading,
-      error,
-    },
+    state: { formState, username, password, loading, error },
     set,
+    assoc,
   } = useState();
+
+  const handleChange = useCallback(
+    (e) => set({ [e.target.name]: e.target.value }),
+    [set]
+  );
 
   useEffect(() => {
     set({ error: "" });
@@ -25,7 +26,7 @@ export const Modal = () => {
       const user = await userbase.signUp({
         username,
         password,
-        rememberMe: "none",
+        rememberMe: "local",
       });
       set({ user, loading: false, layoutMode: "" });
     } catch (e) {
@@ -33,16 +34,22 @@ export const Modal = () => {
     }
   };
 
-  async function handleLogIn(e) {
+  async function handleSignIn(e) {
     e.preventDefault();
     set({ loading: true });
     try {
       const user = await userbase.signIn({
         username,
         password,
-        rememberMe: "none",
+        rememberMe: "local",
       });
-      set({ user, loading: false, toggle: false });
+      set({
+        username,
+        password: "",
+        loggedIn: 1,
+        loading: false,
+        layoutMode: "",
+      });
     } catch (e) {
       set({ loading: false, error: e.message });
     }
@@ -60,10 +67,11 @@ export const Modal = () => {
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="username"
+          name="username"
           type="text"
           placeholder="Username"
           value={username}
-          onChange={(e) => set({ password: e.target.value })}
+          onChange={handleChange}
         />
       </div>
       <div className="mb-4">
@@ -76,12 +84,14 @@ export const Modal = () => {
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="password"
+          name="password"
           type="password"
           placeholder="*******"
           value={password}
-          onChange={(e) => set({ password: e.target.value })}
+          onChange={handleChange}
         />
       </div>
+
       <div className="flex items-center justify-between">
         <span
           className="font-bold cursor-pointer"
@@ -89,15 +99,14 @@ export const Modal = () => {
         >
           Cancel
         </span>
-        {formState === "LOG_IN" ? (
+        <div className="button-group">
           <button
             disabled={loading}
             className="bordered btn-green"
-            onClick={handleLogIn}
+            onClick={handleSignIn}
           >
-            {loading ? "Syncing..." : "Log In"}
+            {loading ? "Syncing..." : "Sign In"}
           </button>
-        ) : (
           <button
             disabled={loading}
             className="bordered btn-green"
@@ -105,7 +114,7 @@ export const Modal = () => {
           >
             {loading ? "Syncing..." : "Sign Up"}
           </button>
-        )}
+        </div>
       </div>
       <p className="text-red-500 font-bold">{error}</p>
     </form>

@@ -1,8 +1,6 @@
 export const initialState = {
-  user: {
-    username: "",
-    password: "",
-  },
+  username: "",
+  password: "",
   habitIds: [1, 2, 3],
   1: { id: 1, name: "walk" },
   2: { id: 2, name: "run" },
@@ -11,4 +9,5 @@ export const initialState = {
   formState: "SIGN_UP",
   loading: false,
   error: false,
+  loggedIn: 0,
 };

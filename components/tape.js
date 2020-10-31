@@ -1,5 +1,6 @@
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useMemo, useEffect, useCallback } from "react";
+import userbase from "userbase-js";
 import * as R from "ramda";
 import dayjs from "dayjs";
 
@@ -39,10 +40,71 @@ const reorder = (list, startIndex, endIndex) => {
   return arr;
 };
 
+const notNil = (x) => !R.isNil(x);
+
 export const Tape = () => {
   const { dispatch, set, assoc, dissoc, state } = useState();
   const { habitIds } = state;
   const today = getToday();
+
+  // const lastWriteWins = useCallback(
+  //   (states) => {
+  //     const latest = R.reduce((acc, elem) => {
+  //       if (R.isNil(acc)) {
+  //         return elem;
+  //       }
+  //       if (dayjs(elem.timestamp).isAfter(dayjs(acc.timestamp))) {
+  //         return elem;
+  //       }
+  //       return acc;
+  //     }, states);
+  //     set(latest);
+  //   },
+  //   [set]
+  // );
+
+  useEffect(() => {
+    const storedString = window.localStorage.getItem("state");
+    console.log("storedString:", storedString);
+    console.log("storedString isNil:", R.isNil(storedString));
+    let savedState;
+    if (notNil(storedString) && R.is(String, storedString)) {
+      savedState = JSON.parse(storedString);
+    }
+    if (notNil(savedState)) {
+      set(savedState);
+    }
+  }, []);
+
+  const openDatabase = useCallback(async () => {
+    try {
+      await userbase.openDatabase({
+        databaseName: "state",
+        changeHandler: (items) => {
+          if (dayjs(items.timestamp).isAfter(dayjs(state.timestamp))) {
+            set(items);
+          }
+        },
+      });
+    } catch (e) {
+      console.error(e.message);
+    }
+  }, [set]);
+  useEffect(() => state.loggedIn && openDatabase(), [state.loggedIn]);
+  useEffect(() => {
+    window.localStorage.setItem("state", JSON.stringify(state));
+    if (state.loggedIn) {
+      userbase.updateItem({
+        databaseName: "state",
+        item: {
+          timestamp: state.timestamp,
+          habitIds: state.habitIds,
+          ...R.pick(state.habitIds, state),
+        },
+        itemId: "state",
+      });
+    }
+  }, [state]);
 
   const dates = useMemo(() => {
     const dates = getLastNDays(NUM_DAYS);
