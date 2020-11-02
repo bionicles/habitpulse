@@ -1,4 +1,9 @@
-module.exports = {
+const withMDX = require("@next/mdx")({
+  extension: /\.mdx?$/,
+});
+
+module.exports = withMDX({
+  pageExtensions: ["js", "jsx", "mdx"],
   webpack: (config, options) => {
     config.module.rules.push({
       test: /\.m4a|\.ico$/,
@@ -7,8 +12,8 @@ module.exports = {
       },
     });
     config.node = {
-      fs: 'empty'
-    }
+      fs: "empty",
+    };
     return config;
   },
-};
+});

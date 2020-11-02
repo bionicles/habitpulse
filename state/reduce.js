@@ -13,18 +13,6 @@ export const reduce = (state, action) => {
   const type = is(String, action) ? action : action[0];
   const payload = is(Array, action) ? action[1] : PAYLOADS[type];
   if (type === "LOAD") return payload;
-  // console.log("prev.timestamp:", prev.timestamp);
-  // console.log("action.timestamp:", action.timestamp);
-  // if (
-  //   type === "SET" &&
-  //   has("timestamp", prev) &&
-  //   has("timestamp", action) &&
-  //   prev.timestamp == action.timestamp
-  // ) {
-  //   console.log("BAILED");
-  //   return assoc("skipped", 1, prev);
-  // }
-  // const state = assocPath(["timestamp"], getNow(), prev); // maybe not on localStorage!
   let newState;
   if (type === "SET" || has(type, PAYLOADS)) {
     newState = mergeDeepRight(state, payload);

@@ -43,11 +43,13 @@ const reorder = (list, startIndex, endIndex) => {
 const notNil = (x) => !isNil(x);
 
 export const Tape = () => {
-  const { dispatch, set, assoc, dissoc, state } = useState();
-  const { habits, signedIn, connected, loaded } = state;
+  const { dispatch, set, assoc, dissoc, state, user } = useState();
+  const { habits, connected, loaded, opened } = state;
   const { ids } = habits;
   const today = getToday();
 
+  // load the localStorage state
+  // triggers: opening the page or reloading
   useEffect(() => {
     if (loaded) return;
     const storedString = window.localStorage.getItem("state");
@@ -63,24 +65,49 @@ export const Tape = () => {
   }, []);
 
   useEffect(() => {
-    if (!state.signedIn) return;
-    async function openDatabase() {
-      userbase
-        .openDatabase({
-          databaseName: "state",
-          changeHandler: (cloudStuff) => set(path([0, "item"], cloudStuff)),
-          // if (dayjs(cloudStuff.timestamp).isAfter(dayjs(currentTime))) {
-          //   set(cloudStuff); // if cloudstuff is newer
-          // } else { // state is newer
-          //   set(mergeDeepRight(cloudStuff, currentState))
-          // }
+    async function initialize() {
+      await userbase
+        .init({ appId: process.env.NEXT_PUBLIC_USERBASE_APP_ID })
+        .then((session) => {
+          console.log("userbase sdk initialized successfully");
+          if (session.user) {
+            // there is a valid active session
+            console.log("valid session:", session.user.username);
+            async function openDatabase() {
+              await userbase
+                .openDatabase({
+                  databaseName: "state",
+                  changeHandler: (cloudStuff) =>
+                    set(path([0, "item"], cloudStuff)),
+                })
+                .then(() => set({ connected: 1 }))
+                .catch((e) => {
+                  console.error(e);
+                });
+            }
+            openDatabase();
+            return session.user;
+          }
+          return undefined;
         })
-        .then(() => set({ connected: 1 }))
-        .catch(console.error);
+        .catch((e) => {
+          console.log("init failed:", e);
+          return undefined;
+        });
     }
-    openDatabase();
-  }, [state.signedIn]);
+    initialize();
+  }, []);
 
+  // open the database.
+  // triggers:
+  // useEffect(() => {
+  //   if (!user) {
+  //     set({ connected: 0 });
+  //   } else {
+  //   }
+  // }, [set]);
+
+  // save the state in localStorage when it changes
   useEffect(() => {
     window.localStorage.setItem("state", JSON.stringify(state));
   }, [state]);
@@ -96,11 +123,12 @@ export const Tape = () => {
   useEffect(triggerScroll, [ids]);
 
   const addHabit = useCallback(() => {
-    const newHabit = { id: nanoid(), name: "Enter a habit..." };
+    const id = nanoid();
+    const newHabit = { id, name: "Enter a habit..." };
     set({
       habits: {
-        ids: [...ids, newHabit.id],
-        [newHabit.id]: newHabit,
+        ids: [...ids, id],
+        [id]: newHabit,
       },
     });
   }, [set]);
@@ -158,7 +186,7 @@ export const Tape = () => {
           <tr className="top-row flex">
             <th className="left-side cursor-default bordered bg-white controls h-64-px text-xl flex items-center justify-center">
               <button className="btn bordered leading-tight text-sm pt-1">
-                {signedIn ? "signed in" : "signed out"}
+                {user ? "userbase on" : "userbase off"}
                 <br />
                 {connected ? "syncing" : "not syncing"}
               </button>
