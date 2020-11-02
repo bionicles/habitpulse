@@ -1,5 +1,5 @@
 import { reduce } from "state";
-import { equals, is } from "ramda";
+import { equals, is, tryCatch } from "ramda";
 import { updateCloud } from "./backend";
 
 var LOGGING = 1;
@@ -13,8 +13,8 @@ export const middleware = (state, action) => {
     }
   }
   const nextState = reduce(state, action);
-  if (!equals(state.habits, nextState.habits)) {
-    updateCloud(nextState);
+  if (state.connected && !equals(state.habits, nextState.habits)) {
+    tryCatch(() => updateCloud(nextState), console.log);
   }
   if (LOGGING) {
     console.log("next state:", nextState);

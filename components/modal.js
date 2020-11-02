@@ -16,7 +16,7 @@ export const Modal = () => {
   );
 
   const handleSignUp = async (e) => {
-    console.log("handleSignUp")
+    console.log("handleSignUp");
     e.preventDefault();
     set({ loading: true });
     try {
@@ -38,7 +38,7 @@ export const Modal = () => {
   };
 
   const handleSignIn = useCallback(async (e) => {
-    console.log("handleSignIn")
+    console.log("handleSignIn");
     e.preventDefault();
     set({ loading: true });
     userbase
@@ -57,23 +57,23 @@ export const Modal = () => {
         })
       )
       .catch((e) => {
-        console.error(e)
         if (e.message == "Already signed in.") {
           set({ layoutMode: "", signedIn: 1, loading: false });
         } else {
+          console.error(e);
           set({ loading: false, error: e.message });
         }
       });
   });
 
   const handleSignOut = useCallback(() => {
-    if (!document || !window) return
+    if (!document || !window) return;
     userbase
       .signOut()
       .then(() => {
         set(initialState);
         window.localStorage.clear();
-        window.history.pushState({}, document.title, "/")
+        window.history.pushState({}, document.title, "/");
       })
       .catch((e) => console.error("handleSignOut Error:", e));
   }, [userbase]);
