@@ -1,20 +1,11 @@
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useMemo,
-  useEffect,
-} from "react";
+import React, { createContext, useContext, useReducer, useMemo } from "react";
 
 import { middleware, initialState } from "state";
 
 const StateContext = createContext();
 
-export const StateProvider = ({ sessionUser, children }) => {
-  const [state, dispatch] = useReducer(middleware, {
-    sessionUser,
-    ...initialState,
-  });
+export const StateProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(middleware, initialState);
   const contextValue = useMemo(() => {
     const set = (payload) => dispatch(["SET", payload]);
     const assoc = (payload) => dispatch(["ASSOC", payload]);

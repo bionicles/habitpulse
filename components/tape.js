@@ -70,9 +70,10 @@ export const Tape = () => {
         .init({ appId: process.env.NEXT_PUBLIC_USERBASE_APP_ID })
         .then((session) => {
           console.log("userbase sdk initialized successfully");
+          console.log("session:", session);
           if (session.user) {
             // there is a valid active session
-            console.log("valid session:", session.user.username);
+            console.log("session.user:", session.user);
             async function openDatabase() {
               await userbase
                 .openDatabase({
@@ -80,19 +81,14 @@ export const Tape = () => {
                   changeHandler: (cloudStuff) =>
                     set(path([0, "item"], cloudStuff)),
                 })
-                .then(() => set({ connected: 1 }))
-                .catch((e) => {
-                  console.error(e);
-                });
+                .then(() => set({ user: session.user, connected: 1 }))
+                .catch((e) => console.log(e));
             }
             openDatabase();
-            return session.user;
           }
-          return undefined;
         })
         .catch((e) => {
           console.log("init failed:", e);
-          return undefined;
         });
     }
     initialize();
@@ -164,8 +160,10 @@ export const Tape = () => {
         };
       } else {
         newState = {
-          ids: filter((x) => x != e.target.name, ids),
-          [e.target.name]: undefined,
+          habits: {
+            ids: filter((x) => x != e.target.name, ids),
+            [e.target.name]: undefined,
+          },
         };
       }
       set(newState);
