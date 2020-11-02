@@ -6,6 +6,9 @@ module.exports = {
         loader: "file-loader",
       },
     });
+    config.node = {
+      fs: 'empty'
+    }
     return config;
   },
 };

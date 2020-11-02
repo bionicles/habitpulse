@@ -1,7 +1,7 @@
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useMemo, useEffect, useCallback } from "react";
 import userbase from "userbase-js";
-import * as R from "ramda";
+import { values, filter, reverse, pick, isNil, is, forEach } from "ramda";
 import dayjs from "dayjs";
 
 import { getToday, playSnap } from "tricks";
@@ -11,21 +11,21 @@ import { nanoid } from "nanoid";
 var NUM_DAYS = 32;
 
 const handleScroll = (e) =>
-  R.forEach(
+  forEach(
     (row) => (row.scrollLeft = e.target.scrollLeft),
     document.getElementsByClassName("scroll")
   );
 
 const handleJump = () => {
   playSnap();
-  R.forEach(
+  forEach(
     (row) => (row.scrollLeft = 9001),
     document.getElementsByClassName("scroll")
   );
 };
 
 const getLastNDays = (n) =>
-  R.reverse(
+  reverse(
     [...Array(n)].map((_, i) => {
       return dayjs().subtract(i, "days").format("YYYYMMDD");
     })
@@ -40,21 +40,21 @@ const reorder = (list, startIndex, endIndex) => {
   return arr;
 };
 
-const notNil = (x) => !R.isNil(x);
+const notNil = (x) => !isNil(x);
 
 export const Tape = () => {
   const { dispatch, set, assoc, dissoc, state } = useState();
-  const { habitIds, signedIn } = state;
+  const { habitIds, signedIn, connected } = state;
   const today = getToday();
 
   useEffect(() => {
     const storedString = window.localStorage.getItem("state");
     let savedState;
-    if (notNil(storedString) && R.is(String, storedString)) {
+    if (notNil(storedString) && is(String, storedString)) {
       savedState = JSON.parse(storedString);
     }
     if (notNil(savedState)) {
-      set(savedState);
+      dispatch(["LOAD", savedState]);
     }
   }, []);
 
@@ -64,9 +64,11 @@ export const Tape = () => {
         userbase
           .openDatabase({
             databaseName: "state",
-            changeHandler: (items) => {
-              if (dayjs(items.timestamp).isAfter(dayjs(state.timestamp))) {
-                set(items);
+            changeHandler: (cloudStuff) => {
+              if (dayjs(cloudStuff.timestamp).isAfter(dayjs(state.timestamp))) {
+                set(cloudStuff);
+              } else { // local copy is newer and thus is higher priority
+                set(mergeDeepRight(cloudStuff, state))
               }
             },
           })
@@ -87,11 +89,11 @@ export const Tape = () => {
             item: {
               timestamp: state.timestamp,
               habitIds: state.habitIds,
-              ...R.pick(state.habitIds, state),
+              ...pick(state.habitIds, state),
             },
             itemId: "state",
           })
-          .then(() => console.log(state.timestamp))
+          .then(() => console.log("wrote state at", state.timestamp, "to userbase"))
           .catch((e) => console.error(e));
       } catch (e) {
         console.error(e);
@@ -101,7 +103,7 @@ export const Tape = () => {
           item: {
             timestamp: state.timestamp,
             habitIds: state.habitIds,
-            ...R.pick(state.habitIds, state),
+            ...pick(state.habitIds, state),
           },
         });
       }
@@ -131,13 +133,20 @@ export const Tape = () => {
 
   const deleteHabit = useCallback(
     (e) => {
-      console.log(e.target.name);
-      const newHabitIds = R.filter((x) => x != e.target.name, habitIds);
-      console.log("newHabitIds: ", newHabitIds);
-      set({
-        habitIds: newHabitIds,
-        [e.target.name]: undefined,
-      });
+      let newState;
+      if (habitIds.length === 1) {
+        const newHabit = { id: nanoid(), name: "Enter a habit..." };
+        newState = {[newHabit.id]: newHabit, [e.target.name]: undefined, habitIds: [newHabit.id]}
+      } else {
+        newState = {
+          habitIds: filter((x) => x != e.target.name, habitIds),
+          [e.target.name]: undefined,
+        } 
+      }
+      set(newState);
+      if (habitIds.length === 1) {
+        setTimeout(handleJump, 1)
+      }
     },
     [habitIds, dissoc]
   );
@@ -165,6 +174,14 @@ export const Tape = () => {
         <thead>
           <tr className="top-row flex">
             <th className="left-side cursor-default bordered bg-white controls h-64-px text-xl flex items-center justify-center">
+              <button className="btn bordered leading-tight text-sm pt-1">
+                {signedIn ? "signed in" : "signed out"}
+                <br/>
+                {connected ? "syncing" : "not syncing"}
+              </button>
+              <button className={`btn-green bordered`} onClick={openModal}>
+                Sync
+              </button>
               <button className="btn-green bordered" onClick={addHabit}>
                 Add Habit
               </button>
@@ -173,9 +190,6 @@ export const Tape = () => {
                 onClick={handleJump}
               >
                 Today
-              </button>
-              <button className={`btn-green bordered`} onClick={openModal}>
-                Sync
               </button>
             </th>
             <td className="date-row right-side scroll flex p-0">
@@ -196,7 +210,7 @@ export const Tape = () => {
           <Droppable droppableId="droppable">
             {(provided) => (
               <tbody ref={provided.innerRef} {...provided.droppableProps}>
-                {R.values(habitIds).map((habitId, index) => {
+                {values(habitIds).map((habitId, index) => {
                   const habit = state[habitId];
                   return (
                     <Draggable

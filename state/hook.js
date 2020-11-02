@@ -3,7 +3,6 @@ import React, {
   useContext,
   useReducer,
   useMemo,
-  useEffect,
 } from "react";
 
 import { middleware, initialState } from "state";

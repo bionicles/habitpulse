@@ -1,4 +1,4 @@
-import * as R from "ramda";
+import { is, has, mergeDeepRight, assocPath, dissocPath } from "ramda";
 import { getNow } from "tricks";
 
 const PAYLOADS = {
@@ -10,17 +10,18 @@ const PAYLOADS = {
 };
 
 export const reduce = (noTimeStampState, action) => {
-  const type = R.is(String, action) ? action : action[0];
-  const payload = R.is(Array, action) ? action[1] : PAYLOADS[type];
-  const state = R.assoc("timestamp", getNow(), noTimeStampState);
-  let newState, unchanged;
-  if (type === "SET" || R.has(type, PAYLOADS)) {
-    newState = R.mergeDeepRight(state, payload);
+  const type = is(String, action) ? action : action[0];
+  const payload = is(Array, action) ? action[1] : PAYLOADS[type];
+  if (type === "LOAD") return payload
+  const state = assocPath(["timestamp"], getNow(), noTimeStampState); // maybe not on localStorage!
+  let newState;
+  if (type === "SET" || has(type, PAYLOADS)) {
+    newState = mergeDeepRight(state, payload);
   } else if (type === "ASSOC") {
     const [targetPath, value] = payload;
-    newState = R.assocPath(targetPath, value, state);
+    newState = assocPath(targetPath, value, state);
   } else if (type === "DISSOC") {
-    newState = R.dissocPath(payload, state);
+    newState = dissocPath(payload, state);
   } else if (type === "RESET") {
     newState = initialState;
   } else {
