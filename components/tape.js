@@ -140,7 +140,9 @@ export const Tape = () => {
     (e) => {
       if (!e.destination) return;
       set({
-        ids: reorder(ids, e.source.index, e.destination.index),
+        habits: {
+          ids: reorder(ids, e.source.index, e.destination.index),
+        },
       });
     },
     [set]
