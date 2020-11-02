@@ -1,7 +1,7 @@
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useMemo, useEffect, useCallback } from "react";
 import userbase from "userbase-js";
-import { values, filter, reverse, pick, isNil, is, forEach } from "ramda";
+import { values, filter, reverse, isNil, is, forEach, path } from "ramda";
 import dayjs from "dayjs";
 
 import { getToday, playSnap } from "tricks";
@@ -44,76 +44,48 @@ const notNil = (x) => !isNil(x);
 
 export const Tape = () => {
   const { dispatch, set, assoc, dissoc, state } = useState();
-  const { habitIds, signedIn, connected } = state;
+  const { habits, signedIn, connected, loaded } = state;
+  const { ids } = habits;
   const today = getToday();
 
   useEffect(() => {
+    if (loaded) return;
     const storedString = window.localStorage.getItem("state");
-    let savedState;
+    let storedState;
     if (notNil(storedString) && is(String, storedString)) {
-      savedState = JSON.parse(storedString);
+      storedState = JSON.parse(storedString);
     }
-    if (notNil(savedState)) {
-      dispatch(["LOAD", savedState]);
+    if (notNil(storedState)) {
+      dispatch(["LOAD", { ...storedState, loaded: 1 }]);
+    } else {
+      set({ loaded: 1 });
     }
   }, []);
 
   useEffect(() => {
+    if (!state.signedIn) return;
     async function openDatabase() {
-      if (state.signedIn) {
-        userbase
-          .openDatabase({
-            databaseName: "state",
-            changeHandler: (cloudStuff) => {
-              if (dayjs(cloudStuff.timestamp).isAfter(dayjs(state.timestamp))) {
-                set(cloudStuff);
-              } else { // local copy is newer and thus is higher priority
-                set(mergeDeepRight(cloudStuff, state))
-              }
-            },
-          })
-          .then(() => set({ connected: 1 }))
-          .catch(console.error);
-      }
+      userbase
+        .openDatabase({
+          databaseName: "state",
+          changeHandler: (cloudStuff) => set(path([0, "item"], cloudStuff)),
+          // if (dayjs(cloudStuff.timestamp).isAfter(dayjs(currentTime))) {
+          //   set(cloudStuff); // if cloudstuff is newer
+          // } else { // state is newer
+          //   set(mergeDeepRight(cloudStuff, currentState))
+          // }
+        })
+        .then(() => set({ connected: 1 }))
+        .catch(console.error);
     }
     openDatabase();
   }, [state.signedIn]);
 
   useEffect(() => {
     window.localStorage.setItem("state", JSON.stringify(state));
-    if (state.signedIn && state.connected) {
-      try {
-        userbase
-          .updateItem({
-            databaseName: "state",
-            item: {
-              timestamp: state.timestamp,
-              habitIds: state.habitIds,
-              ...pick(state.habitIds, state),
-            },
-            itemId: "state",
-          })
-          .then(() => console.log("wrote state at", state.timestamp, "to userbase"))
-          .catch((e) => console.error(e));
-      } catch (e) {
-        console.error(e);
-        userbase.insertItem({
-          databaseName: "state",
-          itemId: "state",
-          item: {
-            timestamp: state.timestamp,
-            habitIds: state.habitIds,
-            ...pick(state.habitIds, state),
-          },
-        });
-      }
-    }
   }, [state]);
 
-  const dates = useMemo(() => {
-    const dates = getLastNDays(NUM_DAYS);
-    return dates;
-  }, [today]);
+  const dates = useMemo(() => getLastNDays(NUM_DAYS), [today]);
 
   useEffect(() => window.addEventListener("scroll", handleScroll, true), []);
   const triggerScroll = useCallback(() => {
@@ -121,62 +93,73 @@ export const Tape = () => {
     const simulatedScrollEvent = new Event("scroll");
     dateRow.dispatchEvent(simulatedScrollEvent);
   }, []);
-  useEffect(triggerScroll, [habitIds]);
+  useEffect(triggerScroll, [ids]);
 
   const addHabit = useCallback(() => {
     const newHabit = { id: nanoid(), name: "Enter a habit..." };
     set({
-      habitIds: [...state.habitIds, newHabit.id],
-      [newHabit.id]: newHabit,
+      habits: {
+        ids: [...ids, newHabit.id],
+        [newHabit.id]: newHabit,
+      },
     });
   }, [set]);
 
-  const deleteHabit = useCallback(
-    (e) => {
-      let newState;
-      if (habitIds.length === 1) {
-        const newHabit = { id: nanoid(), name: "Enter a habit..." };
-        newState = {[newHabit.id]: newHabit, [e.target.name]: undefined, habitIds: [newHabit.id]}
-      } else {
-        newState = {
-          habitIds: filter((x) => x != e.target.name, habitIds),
-          [e.target.name]: undefined,
-        } 
-      }
-      set(newState);
-      if (habitIds.length === 1) {
-        setTimeout(handleJump, 1)
-      }
-    },
-    [habitIds, dissoc]
-  );
-
   const updateHabit = useCallback(
-    (e) => assoc([[e.target.name, "name"], e.target.value]),
+    (e) => {
+      assoc([[e.target.name, "name"], e.target.value]);
+    },
     [assoc]
   );
 
   const onDragEnd = useCallback(
     (e) => {
       if (!e.destination) return;
-      set({ habitIds: reorder(habitIds, e.source.index, e.destination.index) });
+      set({
+        ids: reorder(ids, e.source.index, e.destination.index),
+      });
     },
     [set]
   );
 
+  const deleteHabit = useCallback(
+    (e) => {
+      let newState;
+      if (ids.length === 1) {
+        const newHabit = { id: nanoid(), name: "Enter a habit..." };
+        newState = {
+          habits: {
+            [newHabit.id]: newHabit,
+            [e.target.name]: undefined,
+            ids: [newHabit.id],
+          },
+        };
+      } else {
+        newState = {
+          ids: filter((x) => x != e.target.name, ids),
+          [e.target.name]: undefined,
+        };
+      }
+      set(newState);
+      if (ids.length === 1) {
+        setTimeout(handleJump, 1);
+      }
+    },
+    [ids, dissoc]
+  );
+
   const openModal = useCallback(() => dispatch("OPEN"), [dispatch]);
 
-  useEffect(() => set({ dates }), [dates]);
   useEffect(handleJump, []);
   return (
-    <div className="tape-wrapper my-2" id="tape-wrapper">
+    <div className="tape-wrapper" id="tape-wrapper">
       <table className="tape">
         <thead>
           <tr className="top-row flex">
             <th className="left-side cursor-default bordered bg-white controls h-64-px text-xl flex items-center justify-center">
               <button className="btn bordered leading-tight text-sm pt-1">
                 {signedIn ? "signed in" : "signed out"}
-                <br/>
+                <br />
                 {connected ? "syncing" : "not syncing"}
               </button>
               <button className={`btn-green bordered`} onClick={openModal}>
@@ -210,8 +193,8 @@ export const Tape = () => {
           <Droppable droppableId="droppable">
             {(provided) => (
               <tbody ref={provided.innerRef} {...provided.droppableProps}>
-                {values(habitIds).map((habitId, index) => {
-                  const habit = state[habitId];
+                {values(ids).map((habitId, index) => {
+                  const habit = habits[habitId];
                   return (
                     <Draggable
                       key={habitId}
@@ -259,8 +242,8 @@ export const Tape = () => {
                                 onClick={() => {
                                   playSnap();
                                   habit[date]
-                                    ? dissoc([habitId, date])
-                                    : assoc([[habitId, date], 1]);
+                                    ? assoc([["habits", habitId, date], 0])
+                                    : assoc([["habits", habitId, date], 1]);
                                 }}
                                 key={`${habitId}-${date}`}
                               />

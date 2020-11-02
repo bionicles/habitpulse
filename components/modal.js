@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import userbase from "userbase-js";
 
 import { useState, initialState } from "state";
@@ -16,6 +16,7 @@ export const Modal = () => {
   );
 
   const handleSignUp = async (e) => {
+    console.log("handleSignUp")
     e.preventDefault();
     set({ loading: true });
     try {
@@ -37,9 +38,10 @@ export const Modal = () => {
   };
 
   const handleSignIn = useCallback(async (e) => {
+    console.log("handleSignIn")
     e.preventDefault();
     set({ loading: true });
-    const user = userbase
+    userbase
       .signIn({
         username,
         password,
@@ -55,6 +57,7 @@ export const Modal = () => {
         })
       )
       .catch((e) => {
+        console.error(e)
         if (e.message == "Already signed in.") {
           set({ layoutMode: "", signedIn: 1, loading: false });
         } else {
@@ -64,11 +67,13 @@ export const Modal = () => {
   });
 
   const handleSignOut = useCallback(() => {
+    if (!document || !window) return
     userbase
       .signOut()
       .then(() => {
         set(initialState);
         window.localStorage.clear();
+        window.history.pushState({}, document.title, "/")
       })
       .catch((e) => console.error("handleSignOut Error:", e));
   }, [userbase]);

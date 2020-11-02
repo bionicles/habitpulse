@@ -1,5 +1,5 @@
-import { is, has, mergeDeepRight, assocPath, dissocPath } from "ramda";
-import { getNow } from "tricks";
+import { is, has, mergeDeepRight, assocPath, dissocPath, assoc } from "ramda";
+// import { getNow } from "tricks";
 
 const PAYLOADS = {
   OPEN: { layoutMode: "MODAL" }, // OPEN / CLOSE MODAL!!
@@ -9,11 +9,22 @@ const PAYLOADS = {
   SIGNIN: { signedIn: 1 },
 };
 
-export const reduce = (noTimeStampState, action) => {
+export const reduce = (state, action) => {
   const type = is(String, action) ? action : action[0];
   const payload = is(Array, action) ? action[1] : PAYLOADS[type];
-  if (type === "LOAD") return payload
-  const state = assocPath(["timestamp"], getNow(), noTimeStampState); // maybe not on localStorage!
+  if (type === "LOAD") return payload;
+  // console.log("prev.timestamp:", prev.timestamp);
+  // console.log("action.timestamp:", action.timestamp);
+  // if (
+  //   type === "SET" &&
+  //   has("timestamp", prev) &&
+  //   has("timestamp", action) &&
+  //   prev.timestamp == action.timestamp
+  // ) {
+  //   console.log("BAILED");
+  //   return assoc("skipped", 1, prev);
+  // }
+  // const state = assocPath(["timestamp"], getNow(), prev); // maybe not on localStorage!
   let newState;
   if (type === "SET" || has(type, PAYLOADS)) {
     newState = mergeDeepRight(state, payload);
