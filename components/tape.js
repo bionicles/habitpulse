@@ -186,8 +186,6 @@ export const Tape = () => {
           <tr className="top-row flex">
             <th className="left-side cursor-default bordered bg-white controls h-64-px text-xl flex items-center justify-center">
               <button className="btn bordered leading-tight text-sm pt-1">
-                {user ? "userbase on" : "userbase off"}
-                <br />
                 {connected ? "syncing" : "not syncing"}
               </button>
               <button className={`btn-green bordered`} onClick={openModal}>

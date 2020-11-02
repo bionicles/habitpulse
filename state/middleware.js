@@ -15,6 +15,7 @@ export const middleware = (state, action) => {
     }
   }
   const nextState = reduce(state, action);
+  // push the next state to the cloud
   if (state.connected && !equals(state.habits, nextState.habits)) {
     updateCloud(nextState);
   }
