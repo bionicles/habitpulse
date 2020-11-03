@@ -7,10 +7,10 @@ const buttonClass = `${classify("green")} w-full select-none mt-2`;
 export const Feedback = () => {
   const {
     dispatch,
-    state: { satisfied, score, feedback, isPrivate },
+    state: { satisfied, score, feedback },
   } = useState();
   const handleSubmit = useCallback(() => {
-    const formData = { satisfied, score, feedback, isPrivate };
+    const formData = { satisfied, score, feedback };
     map(dispatch, [
       ["GIVE_FEEDBACK", formData],
       "CLOSE",
@@ -18,7 +18,7 @@ export const Feedback = () => {
       "CLEAR_FEEDBACK",
     ]);
     setTimeout(() => dispatch("HIDE"), 1618);
-  }, [dispatch, satisfied, score, feedback, isPrivate]);
+  }, [dispatch, satisfied, score, feedback]);
 
   return (
     <form className="w-full min-w-md max-w-md rounded p-6">
@@ -39,12 +39,6 @@ export const Feedback = () => {
         name="feedback"
         value={feedback}
         labelText="How can we improve?"
-      />
-      <Checkbox
-        dispatch={dispatch}
-        name="isPrivate"
-        value={isPrivate}
-        labelText="Submit privately?"
       />
       <button className={buttonClass} onClick={handleSubmit} id="submit-button">
         Submit

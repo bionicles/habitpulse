@@ -11,12 +11,6 @@ import { nanoid } from "nanoid";
 
 var NUM_DAYS = 32;
 
-const handleScroll = (e) =>
-  forEach(
-    (row) => (row.scrollLeft = e.target.scrollLeft),
-    document.getElementsByClassName("scroll")
-  );
-
 const getLastNDays = (n) =>
   reverse(
     [...Array(n)].map((_, i) => {
@@ -35,11 +29,25 @@ const reorder = (list, startIndex, endIndex) => {
 
 const notNil = (x) => !isNil(x);
 
+var lastScrollTop;
+
 export const Tape = () => {
   const { dispatch, set, assoc, dissoc, state } = useState();
-  const { habits, connected, loaded, signedIn } = state;
+  const { habits, connected, loaded, signedIn, lastScrollY } = state;
   const { ids } = habits;
   const today = getToday();
+
+  const handleScroll = useCallback(
+    (e) => {
+      console.log("scroll event:", e);
+      if (e.target.classList.contains("overflow-x-hidden")) return;
+      forEach(
+        (row) => (row.scrollLeft = e.target.scrollLeft),
+        document.getElementsByClassName("scroll")
+      );
+    },
+    [set]
+  );
 
   const handleJump = useCallback(() => {
     forEach(
@@ -118,6 +126,7 @@ export const Tape = () => {
   const dates = useMemo(() => getLastNDays(NUM_DAYS), [today]);
 
   useEffect(() => window.addEventListener("scroll", handleScroll, true), []);
+
   const triggerScroll = useCallback(() => {
     const dateRow = document.getElementById("date-row");
     const simulatedScrollEvent = new Event("scroll");
@@ -243,7 +252,11 @@ export const Tape = () => {
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="droppable">
             {(provided) => (
-              <tbody ref={provided.innerRef} {...provided.droppableProps}>
+              <tbody
+                className="overflow-y-scroll"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
                 {values(ids).map((habitId, index) => {
                   const habit = habits[habitId];
                   return (
