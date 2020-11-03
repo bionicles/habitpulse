@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 
 export const classify = (color) => `
 hover:bg-${color}-700 hover:border-${color}-900 bg-${color}-600 border-${color}-800 
-text-white font-bold py-1 px-2 border-b-4 rounded`;
+text-white font-bold py-1 px-1 mr-1 border-b-4 rounded`;
 
 export const Button = ({ color, onClick, children, id }) => {
   const classString = useMemo(() => classify(color), [color]);

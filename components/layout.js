@@ -22,5 +22,9 @@ export const Layout = () => {
     state: { layoutMode },
   } = useState();
 
-  return <div className="flex flex-col">{ChosenForm({ layoutMode })}</div>;
+  return (
+    <div className="flex flex-col place-content-center h-screen">
+      {ChosenForm({ layoutMode })}
+    </div>
+  );
 };

@@ -4,7 +4,7 @@ import userbase from "userbase-js";
 import { values, filter, reverse, isNil, is, forEach, path } from "ramda";
 import dayjs from "dayjs";
 
-import { greenButton } from "components";
+import { greenButton, redButton } from "components";
 import { getToday, playSnap } from "tricks";
 import { useState } from "state";
 import { nanoid } from "nanoid";
@@ -52,6 +52,9 @@ export const Tape = () => {
   // load the localStorage state
   // triggers: opening the page or reloading
   useEffect(() => {
+    window.addEventListener("orientationchange", () =>
+      setTimeout(handleJump, 2)
+    );
     if (loaded) return;
     const storedString = window.localStorage.getItem("state");
     let storedState;
@@ -135,7 +138,7 @@ export const Tape = () => {
 
   const updateHabit = useCallback(
     (e) => {
-      assoc([[e.target.name, "name"], e.target.value]);
+      assoc([["habits", e.target.name, "name"], e.target.value]);
     },
     [assoc]
   );
@@ -182,25 +185,42 @@ export const Tape = () => {
 
   const openModal = useCallback(() => dispatch("OPEN"), [dispatch]);
 
+  const handleCheck = useCallback((habit, habitId, date) => {
+    playSnap();
+    habit[date]
+      ? assoc([["habits", habitId, date], 0])
+      : assoc([["habits", habitId, date], 1]);
+  }, assoc);
+
   useEffect(handleJump, []);
   return (
-    <div className="tape-wrapper" id="tape-wrapper">
-      <table className="tape">
+    <div className="tape-wrapper w-screen" id="tape-wrapper">
+      <table className="tape w-screen">
         <thead>
           <tr className="top-row flex">
-            <th className="left-side cursor-default bordered bg-white controls h-64-px text-xl flex items-center justify-center">
+            <th className="left-side cursor-default bordered bg-white controls h-64-px text-sm sm:text-lg flex items-center justify-center">
               <button
-                className={`${greenButton} leading-tight text-sm pt-1 mr-4`}
+                className={`${
+                  signedIn && connected ? greenButton : redButton
+                } leading-tight text-xs`}
               >
-                {signedIn ? "signed in" : "signed out"}
+                <span className="whitespace-no-wrap">
+                  {signedIn ? "signed in" : "signed out"}
+                </span>
+
                 <br />
-                {connected ? "syncing" : "not syncing"}
+                <span className="whitespace-no-wrap">
+                  {connected ? "syncing" : "not syncing"}
+                </span>
               </button>
               <button className={greenButton} onClick={openModal}>
                 Sync
               </button>
-              <button className={greenButton} onClick={addHabit}>
-                Add Habit
+              <button
+                className={`${greenButton} whitespace-no-wrap`}
+                onClick={addHabit}
+              >
+                <nobr>Add Habit</nobr>
               </button>
               <button className={greenButton} onClick={handleJump}>
                 Today
@@ -267,15 +287,12 @@ export const Tape = () => {
                               <li
                                 className={`checkbox box inline-block cursor-pointer hover:bg-gray-200 ${
                                   habit[date]
-                                    ? "bg-green-500 hover:bg-green-500"
+                                    ? "hover:bg-green-700 bg-green-600"
                                     : null
                                 }`}
-                                onClick={() => {
-                                  playSnap();
-                                  habit[date]
-                                    ? assoc([["habits", habitId, date], 0])
-                                    : assoc([["habits", habitId, date], 1]);
-                                }}
+                                onClick={() =>
+                                  handleCheck(habit, habitId, date)
+                                }
                                 key={`${habitId}-${date}`}
                               />
                             ))}
