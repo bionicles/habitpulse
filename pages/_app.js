@@ -68,11 +68,11 @@ const App = ({ Component, pageProps }) => {
       <StateProvider>
         <Layout>
           <Component {...pageProps} />
-          <div id="svg-container">
-            <audio src="snap.m4a" crossOrigin="anonymous" />
-          </div>
         </Layout>
       </StateProvider>
+      <div id="svg-container">
+        <audio id="snap-audio" src="snap.m4a" crossOrigin="anonymous" />
+      </div>
     </>
   );
 };

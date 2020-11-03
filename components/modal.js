@@ -1,169 +1,60 @@
+import { Feedback, Account, Share, classify } from "components";
 import { useCallback } from "react";
-import userbase from "userbase-js";
+import { useState } from "state";
+import { map } from "ramda";
 
-import { useState, initialState } from "state";
+const selectClass = classify("blue");
+const buttonClass = classify("red");
 
 export const Modal = () => {
   const {
-    state: { username, password, loading, error },
-    set,
+    state: { formState, formOptions, message },
     dispatch,
   } = useState();
-
-  const handleChange = useCallback(
-    (e) => set({ [e.target.name]: e.target.value }),
-    [set]
-  );
-
-  const handleSignUp = async (e) => {
-    console.log("handleSignUp");
-    e.preventDefault();
-    set({ loading: true });
-    try {
-      const user = await userbase.signUp({
-        username,
-        password,
-        rememberMe: "local",
-      });
-      set({
-        user,
-        password: "",
-        signedIn: 1,
-        loading: false,
-        layoutMode: "",
-      });
-    } catch (e) {
-      set({ loading: false, error: e.message });
+  console.log("formOptions:", formOptions);
+  const closeModal = useCallback(() => dispatch("CLOSE"), [dispatch]);
+  const Body = useCallback(() => {
+    switch (formState) {
+      case "Share":
+        return <Share />;
+      case "Account":
+        return <Account />;
+      default:
+        return <Feedback />;
     }
-  };
-
-  const handleSignIn = useCallback(async (e) => {
-    console.log("handleSignIn");
-    e.preventDefault();
-    set({ loading: true });
-    userbase
-      .signIn({
-        username,
-        password,
-        rememberMe: "local",
-      })
-      .then((user) =>
-        set({
-          user,
-          password: "",
-          signedIn: 1,
-          loading: false,
-          layoutMode: "",
-        })
-      )
-      .catch((e) => {
-        if (e.message == "Already signed in.") {
-          set({ layoutMode: "", signedIn: 1, loading: false });
-        } else {
-          console.error(e);
-          set({ loading: false, error: e.message });
-        }
-      });
-  });
-
-  const handleSignOut = useCallback(() => {
-    if (!document || !window) return;
-    userbase
-      .signOut()
-      .then(() => {
-        set(initialState);
-        window.localStorage.clear();
-        window.history.pushState({}, document.title, "/");
-      })
-      .catch((e) => console.error("handleSignOut Error:", e));
-  }, [userbase]);
-
-  const handleDeleteUser = useCallback(() => {
-    userbase
-      .deleteUser()
-      .then(() => {
-        window.localStorage.clear();
-        dispatch("RESET");
-      })
-      .catch((e) => console.error("handleSignOut Error:", e));
-  }, [userbase]);
-
+  }, [formState]);
+  // const Body = () => <div>Form</div>;
+  const handleSelect = useCallback(
+    (e) => dispatch(["SET", { formState: e.target.value }]),
+    [dispatch]
+  );
   return (
-    <form className="bg-white shadow-md rounded p-8">
-      <div className="mb-4">
-        <label
-          className="block text-purple-700 text-sm font-bold mb-2"
-          htmlFor="username"
+    <div className="self-center m-auto shadow-2xl bg-gray-300 rounded">
+      <header className="flex">
+        <select
+          className={selectClass}
+          value={formState}
+          onChange={handleSelect}
         >
-          Username
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="username"
-          name="username"
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={handleChange}
-        />
-      </div>
-      <div className="mb-4">
-        <label
-          className="block text-purple-700 text-sm font-bold mb-2"
-          htmlFor="password"
-        >
-          Password
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="password"
-          name="password"
-          type="password"
-          placeholder="*******"
-          value={password}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span
-          className="font-bold cursor-pointer"
-          onClick={() => set({ layoutMode: "" })}
-        >
-          Cancel
-        </span>
-        <div className="button-group">
-          <button
-            disabled={loading}
-            className="bordered btn-green"
-            onClick={handleSignIn}
-          >
-            {loading ? "Running..." : "Sign In"}
-          </button>
-          <button
-            disabled={loading}
-            className="bordered btn-green"
-            onClick={handleSignUp}
-          >
-            {loading ? "Running..." : "Sign Up"}
-          </button>
-          <button
-            disabled={loading}
-            className="bordered btn-red"
-            onClick={handleSignOut}
-          >
-            {loading ? "Running..." : "Sign Out"}
-          </button>
-          <button
-            disabled={loading}
-            className="bordered btn-red"
-            onClick={handleDeleteUser}
-          >
-            {loading ? "Running..." : "Delete Account"}
-          </button>
-        </div>
-      </div>
-      <p className="text-red-500 font-bold">{error}</p>
-    </form>
+          {map(
+            (formOption) => (
+              <option
+                key={formOption}
+                className={formOption === formState ? "hidden" : ""}
+                value={formOption}
+              >
+                {formOption}
+              </option>
+            ),
+            formOptions
+          )}
+        </select>
+        <button onClick={closeModal} className={buttonClass + " w-full"}>
+          Close
+        </button>
+      </header>
+      <Body />
+      <p className="text-red-500 font-bold">{message}</p>
+    </div>
   );
 };

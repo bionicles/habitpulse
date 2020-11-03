@@ -4,6 +4,7 @@ import userbase from "userbase-js";
 import { values, filter, reverse, isNil, is, forEach, path } from "ramda";
 import dayjs from "dayjs";
 
+import { greenButton } from "components";
 import { getToday, playSnap } from "tricks";
 import { useState } from "state";
 import { nanoid } from "nanoid";
@@ -15,14 +16,6 @@ const handleScroll = (e) =>
     (row) => (row.scrollLeft = e.target.scrollLeft),
     document.getElementsByClassName("scroll")
   );
-
-const handleJump = () => {
-  playSnap();
-  forEach(
-    (row) => (row.scrollLeft = 9001),
-    document.getElementsByClassName("scroll")
-  );
-};
 
 const getLastNDays = (n) =>
   reverse(
@@ -43,10 +36,18 @@ const reorder = (list, startIndex, endIndex) => {
 const notNil = (x) => !isNil(x);
 
 export const Tape = () => {
-  const { dispatch, set, assoc, dissoc, state, user } = useState();
-  const { habits, connected, loaded, opened } = state;
+  const { dispatch, set, assoc, dissoc, state } = useState();
+  const { habits, connected, loaded, signedIn } = state;
   const { ids } = habits;
   const today = getToday();
+
+  const handleJump = useCallback(() => {
+    forEach(
+      (row) => (row.scrollLeft = 9001),
+      document.getElementsByClassName("scroll")
+    );
+    playSnap();
+  }, []);
 
   // load the localStorage state
   // triggers: opening the page or reloading
@@ -81,14 +82,17 @@ export const Tape = () => {
                   changeHandler: (cloudStuff) =>
                     set(path([0, "item"], cloudStuff)),
                 })
-                .then(() => set({ user: session.user, connected: 1 }))
-                .catch((e) => console.log(e));
+                .then(() =>
+                  set({ user: session.user, signedIn: 1, connected: 1 })
+                )
+                .catch((e) => console.log("error opening database:", e));
             }
             openDatabase();
           }
         })
         .catch((e) => {
-          console.log("init failed:", e);
+          console.log("error initializing userbase:", e);
+          set({ signedIn: 0, connected: 0 });
         });
     }
     initialize();
@@ -185,19 +189,20 @@ export const Tape = () => {
         <thead>
           <tr className="top-row flex">
             <th className="left-side cursor-default bordered bg-white controls h-64-px text-xl flex items-center justify-center">
-              <button className="btn bordered leading-tight text-sm pt-1">
+              <button
+                className={`${greenButton} leading-tight text-sm pt-1 mr-4`}
+              >
+                {signedIn ? "signed in" : "signed out"}
+                <br />
                 {connected ? "syncing" : "not syncing"}
               </button>
-              <button className={`btn-green bordered`} onClick={openModal}>
+              <button className={greenButton} onClick={openModal}>
                 Sync
               </button>
-              <button className="btn-green bordered" onClick={addHabit}>
+              <button className={greenButton} onClick={addHabit}>
                 Add Habit
               </button>
-              <button
-                className="btn-green bordered inline-block cursor-pointer"
-                onClick={handleJump}
-              >
+              <button className={greenButton} onClick={handleJump}>
                 Today
               </button>
             </th>
