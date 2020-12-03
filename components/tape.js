@@ -54,14 +54,14 @@ export const Tape = () => {
       (row) => (row.scrollLeft = 9001),
       document.getElementsByClassName("scroll")
     );
-    playSnap();
+    // playSnap();
   }, []);
 
   // load the localStorage state
   // triggers: opening the page or reloading
   useEffect(() => {
     window.addEventListener("orientationchange", () =>
-      setTimeout(handleJump, 8)
+      setTimeout(handleJump, 32)
     );
     if (loaded) return;
     const storedString = window.localStorage.getItem("state");
