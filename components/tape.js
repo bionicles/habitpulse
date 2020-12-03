@@ -61,7 +61,7 @@ export const Tape = () => {
   // triggers: opening the page or reloading
   useEffect(() => {
     window.addEventListener("orientationchange", () =>
-      setTimeout(handleJump, 2)
+      setTimeout(handleJump, 8)
     );
     if (loaded) return;
     const storedString = window.localStorage.getItem("state");
