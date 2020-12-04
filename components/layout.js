@@ -10,7 +10,6 @@ const ChosenForm = ({ layoutMode }) => {
     default:
       return (
         <div className="h-screen w-screen overflow-x-hidden overflow-y-scroll max-w-full">
-          <Nav />
           <Tape />
         </div>
       );
