@@ -287,6 +287,7 @@ export const Tape = () => {
                                 onClick={handleNameClick}
                                 name={habitId}
                                 value={habit.name}
+                                spellcheck="false"
                                 onChange={updateHabit}
                                 size="16"
                               />
